@@ -1,9 +1,10 @@
 from beanie import init_beanie, Document, UnionDoc
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
+from fastapi.middleware.cors import CORSMiddleware
 
 from app import MONGO_DSN, ENVIRONMENT, projectConfig
-from app.routers import system
+from app.routers import system, user
 
 if ENVIRONMENT == "prod":
     app = FastAPI(
@@ -21,12 +22,21 @@ else:
     )
 
 app.include_router(system.router)
+app.include_router(user.router)
 
 @app.on_event('startup')
 async def startup_event():
     client = AsyncIOMotorClient(MONGO_DSN)
 
     await init_beanie(
-        database=client.get_default_database(),
+        database=client['Predprof'],
         document_models=Document.__subclasses__() + UnionDoc.__subclasses__()
     )
+    
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
