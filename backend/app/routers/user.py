@@ -13,9 +13,9 @@ redis = Redis(host=REDIS_HOST, port=REDIS_PORT)
 @router.post("/create")
 async def registration_user(request: schemas.RequestCreateUser) -> schemas.ResponseUserLogIn:
     user = await create_user(request)
-    token = await authenticate_user(data={"sub": request.email})
+    token = await authenticate_user(data={"sub": request.username})
     
-    redis.set(token, user.email, ex=int(ACCESS_TOKEN_EXPIRE_MINUTES_REDIS))
+    redis.set(token, user.username, ex=int(ACCESS_TOKEN_EXPIRE_MINUTES_REDIS))
 
     return schemas.ResponseUserLogIn(
         user_token=token
@@ -24,13 +24,13 @@ async def registration_user(request: schemas.RequestCreateUser) -> schemas.Respo
 
 @router.post("/log_in")
 async def log_in_user(request: schemas.RequestLogInUser) -> schemas.ResponseUserLogIn:
-    user = await User.find_one(User.email == request.email)
+    user = await User.find_one(User.username == request.username)
     if not user or not verify_password(request.password, user.hashed_password):
         raise HTTPException(status_code=404, detail="Incorrect email or password")
     
-    token = await authenticate_user(data={"sub": request.email})
+    token = await authenticate_user(data={"sub": request.username})
     
-    redis.set(token, user.email, ex=int(ACCESS_TOKEN_EXPIRE_MINUTES_REDIS))
+    redis.set(token, user.username, ex=int(ACCESS_TOKEN_EXPIRE_MINUTES_REDIS))
 
     return schemas.ResponseUserLogIn(
         user_token=token

@@ -1,11 +1,23 @@
 from beanie import Document, Link
 from pydantic import EmailStr, BaseModel, Field
+from enum import IntEnum
+
+class Status(IntEnum):
+    AWAITING = 0
+    ACCEPTED = 1
+    CANCELED = 3
 
 class User(Document):
     username: str
-    email: EmailStr
     hashed_password: str
     equipment: list[str] = []
+    
+class EquipmentRequest(Document):
+    user_id: str
+    equipment_id: str
+    quantity: int
+    use_purpose: str
+    status: Status
     
 class SecretAdmin(Document):
     """
