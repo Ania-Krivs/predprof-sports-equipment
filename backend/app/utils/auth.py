@@ -12,26 +12,26 @@ context_pass = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 async def create_user(create: schemas.RequestCreateUser):
-    
     user_exists = await User.find_one(User.username == create.username)
     if user_exists:
         raise HTTPException(status_code=409, detail="User already exists")
-    
+
     hashed_password = context_pass.hash(create.password)
     user = User(
         username=create.username,
         hashed_password=hashed_password,
         equipment=[]
     )
-    
+
     await user.create()
     return schemas.ResponseUserAuth(
         username=create.username
     )
-    
+
+
 async def authenticate_user(data: dict):
     access_token = await create_token(data)
-    
+
     return access_token
 
 
@@ -39,7 +39,7 @@ async def create_token(data: dict, expires_delta: timedelta = None):
     '''
         data: email
     '''
-    
+
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
