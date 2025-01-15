@@ -15,6 +15,7 @@ oauth_bearer = OAuth2PasswordBearer(
     tokenUrl="/api/token/new"
 )
 
+
 def verify_password(plain_password, hashed_password):
     """
     Verify if the provided plain password matches the hashed password.
@@ -54,7 +55,7 @@ async def authenticate_user(username: str, password: str):
     Returns:
         AdminFront (bool): The user object if authentication is successful, False otherwise.
     """
-    #TODO: Handle existans of admin user in Mongo
+    # TODO: Handle existans of admin user in Mongo
     user = await AdminFront.find({"username": username}, fetch_links=True).to_list()
     hashed_instance = await user[0].secret.fetch()
     print(hashed_instance.hashed_password)
@@ -83,7 +84,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         expire = datetime.now(timezone.utc) + timedelta(minutes=1)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECURITY_KEY, algorithm=ALGORITHM)
-    
+
     return encoded_jwt
 
 
@@ -104,21 +105,22 @@ async def get_current_user(token: Annotated[str, Depends(oauth_bearer)]):
     try:
         payload = jwt.decode(token, SECURITY_KEY, algorithms=[ALGORITHM])
         print(payload)
-        
+
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=404, detail="Username is not found")
-        
+
         token_data = TokenData(username=username)
     except:
         raise HTTPException(status_code=404, detail="Invalid token")
 
     user = await AdminFront.find_one(AdminFront.username == token_data.username)
-    
+
     if user is None:
         raise HTTPException(status_code=404, detail="AdminFront User is not found")
-    
+
     return user
+
 
 async def get_current_user_ordinary(token: str):
     """
@@ -137,27 +139,26 @@ async def get_current_user_ordinary(token: str):
     try:
         payload = jwt.decode(token, SECURITY_KEY_USER, algorithms=[ALGORITHM])
         print(payload)
-        
+
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=404, detail="Username is not found")
-        
+
         token_data = TokenData(username=username)
         print(token_data)
     except:
         raise HTTPException(status_code=404, detail="Invalid token")
-    
- 
+
     user = await User.find_one(User.email == token_data.username, fetch_links=True)
-    
+
     if user is None:
         raise HTTPException(status_code=404, detail="User is not found")
-    
+
     return user
 
 
 async def get_current_active_user(
-    current_user: Annotated[AdminFront, Depends(get_current_user)],
+        current_user: Annotated[AdminFront, Depends(get_current_user)],
 ):
     """
     Retrieve the current active user.
@@ -171,5 +172,5 @@ async def get_current_active_user(
     Raises:
         Errors.INACTIVE_USER_EXCEPTION: If the user is inactive.
     """
-    
+
     return current_user
