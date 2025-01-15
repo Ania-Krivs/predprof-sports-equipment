@@ -1,24 +1,35 @@
 from beanie import Document, Link
-from pydantic import EmailStr, BaseModel, Field
+from pydantic import BaseModel, Field
 from enum import IntEnum
+from datetime import datetime
+
 
 class Status(IntEnum):
     AWAITING = 0
     ACCEPTED = 1
     CANCELED = 3
 
+
+class InventoryStatus(IntEnum):
+    BROKEN = 0
+    USED = 1
+    NEW = 2
+
+
 class User(Document):
     username: str
     hashed_password: str
     equipment: list[str] = []
-    
+
+
 class EquipmentRequest(Document):
     user_id: str
     equipment_id: str
     quantity: int
     use_purpose: str
     status: Status
-    
+
+
 class SecretAdmin(Document):
     """
     SecretAdmin model representing an admin user with additional security attributes.
@@ -45,10 +56,11 @@ class AdminFront(Document):
     disabled: bool = Field(default=False)
     full_name: str = Field(default=None)
     secret: Link[SecretAdmin] = Field()
-    
+
+
 class Arrow(Document):
     ids: list[int] = []
-    
+
 
 class Token(BaseModel):
     """
@@ -73,3 +85,12 @@ class TokenData(BaseModel):
 
     username: str
 
+
+class Inventory(Document):
+    name: str
+    amount: int
+    used_by_user_ids: list[str]
+
+    state: InventoryStatus
+    updated_at: datetime = datetime.now()
+    created_at: datetime = datetime.now()
