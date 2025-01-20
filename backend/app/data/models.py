@@ -89,7 +89,7 @@ class TokenData(BaseModel):
 class Inventory(Document):
     name: str
     amount: int
-    used_by_user_ids: list[str]
+    used_by_user_ids: list[User]
 
     state: InventoryStatus
     updated_at: datetime = datetime.now()
