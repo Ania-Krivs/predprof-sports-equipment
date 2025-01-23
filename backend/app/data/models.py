@@ -3,13 +3,11 @@ from pydantic import BaseModel, Field
 from enum import IntEnum
 from datetime import datetime
 
-
 class Status(IntEnum):
     AWAITING = 0
     ACCEPTED = 1
     CANCELED = 3
-
-
+    
 class InventoryStatus(IntEnum):
     BROKEN = 0
     USED = 1
@@ -61,7 +59,6 @@ class AdminFront(Document):
 class Arrow(Document):
     ids: list[int] = []
 
-
 class Token(BaseModel):
     """
     Token model representing an access token.
@@ -84,8 +81,7 @@ class TokenData(BaseModel):
     """
 
     username: str
-
-
+    
 class Inventory(Document):
     name: str
     amount: int

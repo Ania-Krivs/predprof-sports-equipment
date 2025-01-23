@@ -24,7 +24,6 @@ class SInventoryAdd(SInventoryAddData):
     updated_at: datetime = Field(description="Дата обновления инвентаря", default=datetime.now())
     created_at: datetime = Field(description="Дата создания инвентаря", default=datetime.now())
 
-
 class ResponseUserLogIn(BaseModel):
     user_token: str
 
@@ -56,3 +55,4 @@ class ResponseEquipmentRequest(BaseModel):
     quantity: int
     use_purpose: str
     status: Status
+
