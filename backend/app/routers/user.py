@@ -16,7 +16,7 @@ async def registration_user(request: schemas.RequestCreateUser) -> schemas.Respo
     user = await create_user(request)
     token = await authenticate_user(data={"sub": request.username})
 
-    await redis.set(token, user.username, ex=int(ACCESS_TOKEN_EXPIRE_MINUTES_REDIS))
+    redis.set(token, user.username, ex=int(ACCESS_TOKEN_EXPIRE_MINUTES_REDIS))
 
     return schemas.ResponseUserLogIn(
         user_token=token
@@ -31,7 +31,7 @@ async def log_in_user(request: schemas.RequestLogInUser) -> schemas.ResponseUser
 
     token = await authenticate_user(data={"sub": request.username})
 
-    await redis.set(token, user.username, ex=int(ACCESS_TOKEN_EXPIRE_MINUTES_REDIS))
+    redis.set(token, user.username, ex=int(ACCESS_TOKEN_EXPIRE_MINUTES_REDIS))
 
     return schemas.ResponseUserLogIn(
         user_token=token
