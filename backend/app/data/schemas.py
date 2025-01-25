@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pydantic import BaseModel, Field
 from datetime import datetime
 from app.data.models import Status, InventoryStatus
@@ -12,17 +14,20 @@ class SInventoryUpdateData(SInventoryId):
     name: str = Field(description="Название инвентаря", default="name")
     amount: int = Field(description="Количество инвентаря", default=1)
     state: InventoryStatus | int = Field(description="Состояние инвентаря", default=InventoryStatus.USED)
+    description: str = Field(description="Описание инвентаря", default="")
 
 
 class SInventoryAddData(BaseModel):
     name: str = Field(description="Название инвентаря", default="name")
     amount: int = Field(description="Количество инвентаря", default=1)
     state: str = Field(description="Состояние инвентаря", default=InventoryStatus.NEW)
+    description: str = Field(description="Описание инвентаря", default="")
 
 
 class SInventoryAdd(SInventoryAddData):
     updated_at: datetime = Field(description="Дата обновления инвентаря", default=datetime.now())
     created_at: datetime = Field(description="Дата создания инвентаря", default=datetime.now())
+
 
 class ResponseUserLogIn(BaseModel):
     user_token: str
@@ -55,4 +60,3 @@ class ResponseEquipmentRequest(BaseModel):
     quantity: int
     use_purpose: str
     status: Status
-
