@@ -1,5 +1,5 @@
 from app.data.models import Inventory, User
-from app.data.schemas import SInventoryId, SInventoryUpdateData, SInventoryAddData
+from app.data.schemas import SInventoryId, SInventoryUpdateData, SInventoryAddData, SInventoryUpdateImage
 from datetime import datetime
 from app.exceptions import InventoryAlreadyExisted
 from fastapi import APIRouter, File, Form
@@ -35,11 +35,17 @@ async def update_inventory_by_id(update_data: SInventoryUpdateData) -> dict:
 
 
 @inventory_router.patch("/update_inventory_image")
-async def update_inventory_image(inventory_id: SInventoryId, file: Annotated[bytes, File()],
+async def update_inventory_image(inventory_data: SInventoryUpdateImage, file: Annotated[bytes, File()],
                                  extension: Annotated[str, Form()] = "png") -> dict:
     image = await process_image(file, extension)
 
-    inventory = await Inventory.find_one(Inventory.id == inventory_id.id)
+    inventory = await Inventory.find_one(Inventory.id == inventory_data.id)
+    
+    if inventory_data.user_id not in inventory.used_by_user_ids:
+        inventory.used_by_user_ids.append(inventory_data.user_id)
+
+    inventory.updated_at = datetime.now()
+
     inventory.image = image["image_link"]
     await inventory.save()
 
