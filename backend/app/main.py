@@ -1,10 +1,11 @@
 from beanie import init_beanie, Document, UnionDoc
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app import MONGO_DSN, ENVIRONMENT, projectConfig
-from backend.app.routers import system, user, inventory
+from app import MONGO_DSN, ENVIRONMENT, projectConfig
+from app.routers import system, user, inventory
 
 if ENVIRONMENT == "prod":
     app = FastAPI(
@@ -21,6 +22,7 @@ else:
         description=projectConfig.__description__
     )
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.include_router(system.router)
 app.include_router(user.router)
 app.include_router(inventory.inventory_router)
