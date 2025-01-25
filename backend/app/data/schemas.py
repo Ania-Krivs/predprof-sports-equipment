@@ -29,6 +29,10 @@ class SInventoryAdd(SInventoryAddData):
     created_at: datetime = Field(description="Дата создания инвентаря", default=datetime.now())
 
 
+class SInventoryUpdateImage(SInventoryId):
+    user_id: str = Field(default="ID пользователя")
+
+
 class ResponseUserLogIn(BaseModel):
     user_token: str
 
