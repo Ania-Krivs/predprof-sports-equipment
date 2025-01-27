@@ -1,5 +1,5 @@
 from app.data.models import Inventory, User
-from app.data.schemas import SInventoryId, SInventoryUpdateData, SInventoryAddData, SInventoryUpdateImage
+from app.data import schemas
 from datetime import datetime
 from app.exceptions import InventoryAlreadyExisted
 from fastapi import APIRouter, File, Form
@@ -11,13 +11,13 @@ inventory_router = APIRouter(prefix="/inventory", tags=["Inventory"])
 
 
 @inventory_router.delete("/delete_inventory")
-async def delete_inventory_by_id(delete_data: SInventoryId) -> dict:
+async def delete_inventory_by_id(delete_data: schemas.SInventoryId) -> dict:
     await (await Inventory.find_one(Inventory.id == delete_data.id)).delete()
     return {"ok": True}
 
 
 @inventory_router.patch("/update_inventory")
-async def update_inventory_by_id(update_data: SInventoryUpdateData) -> dict:
+async def update_inventory_by_id(update_data: schemas.SInventoryUpdateData) -> dict:
     inventory = await Inventory.find_one(Inventory.id == update_data.id)
 
     inventory.name = update_data.name
@@ -35,7 +35,7 @@ async def update_inventory_by_id(update_data: SInventoryUpdateData) -> dict:
 
 
 @inventory_router.patch("/update_inventory_image")
-async def update_inventory_image(inventory_data: SInventoryUpdateImage, file: Annotated[bytes, File()],
+async def update_inventory_image(inventory_data: schemas.SInventoryUpdateImage, file: Annotated[bytes, File()],
                                  extension: Annotated[str, Form()] = "png") -> dict:
     image = await process_image(file, extension)
 
@@ -54,7 +54,7 @@ async def update_inventory_image(inventory_data: SInventoryUpdateImage, file: An
 
 
 @inventory_router.post("/add_inventory")
-async def add_inventory(add_data: SInventoryAddData, file: Annotated[bytes, File(), None] = None,
+async def add_inventory(add_data: schemas.SInventoryAddData, file: Annotated[bytes, File(), None] = None,
                         extension: Annotated[str, Form()] = "png") -> dict:
     if await Inventory.find_one(add_data.name == Inventory.name):
         raise InventoryAlreadyExisted

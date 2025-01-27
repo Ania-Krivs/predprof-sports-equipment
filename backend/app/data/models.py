@@ -1,8 +1,8 @@
 from beanie import Document, Link
 from pydantic import BaseModel, Field
+from typing import Optional, List
 from enum import IntEnum
 from datetime import datetime
-
 
 class Status(IntEnum):
     AWAITING = 0
@@ -16,15 +16,35 @@ class InventoryStatus(IntEnum):
     NEW = 2
 
 
+class Inventory(Document):
+    name: str
+    amount: int
+    used_by_user: List[str]
+
+    state: InventoryStatus
+    updated_at: str 
+    created_at: str 
+    
 class User(Document):
     username: str
     hashed_password: str
-    equipment: list[str] = []
+    equipment: Optional[Inventory] = []
 
 
-class EquipmentRequest(Document):
-    user_id: str
-    equipment_id: str
+class Admin(Document):
+    username: str
+    hashed_password: str
+
+# class EquipmentRequest(Document):
+#     user_id: str
+#     equipment_id: str
+#     quantity: int
+#     use_purpose: str
+#     status: Status
+    
+class InventoryApplication(Document):
+    user: User
+    inventory: Inventory
     quantity: int
     use_purpose: str
     status: Status
@@ -84,15 +104,3 @@ class TokenData(BaseModel):
     """
 
     username: str
-
-
-class Inventory(Document):
-    name: str
-    amount: int
-    used_by_user_ids: list[str]
-    image: str
-    description: str
-
-    state: InventoryStatus
-    updated_at: datetime = datetime.now()
-    created_at: datetime = datetime.now()
