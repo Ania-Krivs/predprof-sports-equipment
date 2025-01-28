@@ -36,3 +36,4 @@ async def log_in_user(request: schemas.RequestLogInUser) -> schemas.ResponseUser
     return schemas.ResponseUserLogIn(
         user_token=token
     )
+    

@@ -7,7 +7,7 @@ from enum import IntEnum
 class Status(IntEnum):
     AWAITING = 0
     ACCEPTED = 1
-    CANCELED = 3
+    CANCELED = 2
 
 
 class InventoryStatus(IntEnum):
@@ -20,7 +20,7 @@ class Inventory(Document):
     name: str
     amount: int
     used_by_user: List[str]
-    image: str
+    image: Optional[str] = Field(None)
     description: str
 
     state: InventoryStatus
@@ -31,7 +31,7 @@ class Inventory(Document):
 class User(Document):
     username: str
     hashed_password: str
-    equipment: Optional[Inventory] = []
+    inventory: List[Optional[Inventory]] = []
 
 
 class Admin(Document):
@@ -47,8 +47,8 @@ class Admin(Document):
 #     status: Status
 
 class InventoryApplication(Document):
-    user: User
-    inventory: Inventory
+    user: Link[User]
+    inventory: Link[Inventory]
     quantity: int
     use_purpose: str
     status: Status

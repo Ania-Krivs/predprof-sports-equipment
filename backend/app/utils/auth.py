@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from app.utils.security import context_pass
-from app.data.models import User
+from app.data.models import User, Admin
 from app.data import schemas
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
@@ -20,7 +20,24 @@ async def create_user(create: schemas.RequestCreateUser):
     user = User(
         username=create.username,
         hashed_password=hashed_password,
-        equipment=None
+        inventory=None
+    )
+
+    await user.create()
+    return schemas.ResponseUserAuth(
+        username=create.username
+    )
+    
+    
+async def create_admin(create: schemas.RequestCreateUser):
+    user_exists = await Admin.find_one(Admin.username == create.username)
+    if user_exists:
+        raise HTTPException(status_code=409, detail="User already exists")
+
+    hashed_password = context_pass.hash(create.password)
+    user = Admin(
+        username=create.username,
+        hashed_password=hashed_password
     )
 
     await user.create()

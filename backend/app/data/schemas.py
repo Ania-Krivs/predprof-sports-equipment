@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
-from app.data.models import Status, InventoryStatus, Inventory
+from app.data.models import Status, InventoryStatus, Inventory, User
 from typing import List, Optional
 
 
@@ -37,6 +37,9 @@ class RequestInventoryApplication(BaseModel):
 
 class ResponseUserLogIn(BaseModel):
     user_token: str
+    
+class ResponseAdminLogIn(BaseModel):
+    admin_token: str
 
 
 class RequestCreateUser(BaseModel):
@@ -69,7 +72,7 @@ class ResponseInventoryRequest(BaseModel):
 
 
 class ResponseGetInventoryApplication(BaseModel):
-    user_id: str
+    user: User
     inventory: Inventory
     quantity: int
     use_purpose: str
@@ -85,4 +88,5 @@ class ResponseInventoryApplication(BaseModel):
 
 
 class RequestApplicationUpdate(BaseModel):
+    application_id: str
     status: int = Field(description="AWAITING = 0, ACCEPTED = 1, CANCELED = 3")
