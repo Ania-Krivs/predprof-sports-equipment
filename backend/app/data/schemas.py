@@ -91,7 +91,7 @@ class RequestApplicationUpdate(BaseModel):
     application_id: str
     status: int = Field(description="AWAITING = 0, ACCEPTED = 1, CANCELED = 3")
     
-class RequestConsolidationInventory(BaseModel):
+class RequestAssignmentInventory(BaseModel):
     user_id: str
     inventory_id: str
     
