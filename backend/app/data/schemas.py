@@ -90,3 +90,17 @@ class ResponseInventoryApplication(BaseModel):
 class RequestApplicationUpdate(BaseModel):
     application_id: str
     status: int = Field(description="AWAITING = 0, ACCEPTED = 1, CANCELED = 3")
+    
+class RequestConsolidationInventory(BaseModel):
+    user_id: str
+    inventory_id: str
+    
+class CreateInventoryPlan(BaseModel):
+    name: str
+    manufacturer: str
+    price: float
+    
+class UpdateInventoryPlan(BaseModel):
+    name: Optional[str] = Field(None)
+    manufacturer: Optional[str] = Field(None)
+    price: Optional[float] = Field(None)

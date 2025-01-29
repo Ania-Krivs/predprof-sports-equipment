@@ -37,7 +37,7 @@ async def create_inventory_application(token: Annotated[str, Header()],
     return {"status": True}
 
 
-@router.get("/user/{user_token}")
+@router.get("/{user_token}")
 async def get_inventory_application_by_user(user_token: str) -> List[schemas.ResponseGetInventoryApplication]:
     username = redis.get(user_token)
     if not username:

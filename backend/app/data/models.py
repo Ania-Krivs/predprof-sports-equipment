@@ -52,6 +52,11 @@ class InventoryApplication(Document):
     quantity: int
     use_purpose: str
     status: Status
+    
+class InventoryPlan(Document):
+    name: str
+    manufacturer: str
+    price: float
 
 
 class SecretAdmin(Document):
