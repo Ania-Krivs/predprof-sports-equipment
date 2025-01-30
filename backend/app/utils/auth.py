@@ -20,7 +20,7 @@ async def create_user(create: schemas.RequestCreateUser):
     user = User(
         username=create.username,
         hashed_password=hashed_password,
-        inventory=None
+        inventory=[]
     )
 
     await user.create()
