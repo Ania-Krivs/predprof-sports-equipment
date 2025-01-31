@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import MONGO_DSN, ENVIRONMENT, projectConfig
-from app.routers import system, user, inventory, inventory_application, admin, inventory_plan
+from app.routers import user, inventory, inventory_application, admin, inventory_plan, inventory_repair, statistics
 
 if ENVIRONMENT == "prod":
     app = FastAPI(
@@ -24,12 +24,13 @@ else:
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-app.include_router(system.router)
 app.include_router(user.router)
 app.include_router(inventory.inventory_router)
 app.include_router(inventory_application.router)
 app.include_router(admin.router)
 app.include_router(inventory_plan.router)
+app.include_router(inventory_repair.router)
+app.include_router(statistics.router)
 
 
 @app.on_event('startup')

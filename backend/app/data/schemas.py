@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
-from app.data.models import Status, InventoryStatus, Inventory, User
+from app.data.models import Status, InventoryStatus, Inventory, User, StatusInventoryRepair
 from typing import List, Optional
 
 
@@ -72,6 +72,7 @@ class ResponseInventoryRequest(BaseModel):
 
 
 class ResponseGetInventoryApplication(BaseModel):
+    id: str
     user: User
     inventory: Inventory
     quantity: int
@@ -100,7 +101,31 @@ class CreateInventoryPlan(BaseModel):
     manufacturer: str
     price: float
     
+class ResponseCreateInventoryPlan(BaseModel):
+    id: str
+    name: str
+    manufacturer: str
+    price: float
+    
 class UpdateInventoryPlan(BaseModel):
     name: Optional[str] = Field(None)
     manufacturer: Optional[str] = Field(None)
     price: Optional[float] = Field(None)
+    
+class RequestInventoryRepair(BaseModel):
+    inventory_id: str
+    describtion: str
+    status: int = Field(description="REPAIR = 0, REPLACING = 1")
+    
+class ResponseInventoryRepair(BaseModel):
+    id: str
+    user: User
+    inventory: Inventory
+    describtion: str
+    status: int = Field(description="REPAIR = 0, REPLACING = 1")
+    
+class Statistic(BaseModel):
+    inventory_in_use: int
+    inventory_repair: int
+    need_to_replace: int
+    broken: int

@@ -14,6 +14,10 @@ class InventoryStatus(IntEnum):
     BROKEN = 0
     USED = 1
     NEW = 2
+    
+class StatusInventoryRepair(IntEnum):
+    REPAIR = 0
+    REPLACING = 1
 
 
 class Inventory(Document):
@@ -57,6 +61,12 @@ class InventoryPlan(Document):
     name: str
     manufacturer: str
     price: float
+    
+class InventoryRepair(Document):
+    user: Link[User]
+    inventory: Link[Inventory]
+    describtion: str
+    status: StatusInventoryRepair
 
 
 class SecretAdmin(Document):
