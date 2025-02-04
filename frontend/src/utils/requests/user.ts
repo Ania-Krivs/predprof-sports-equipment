@@ -1,3 +1,5 @@
+import { User } from "../../static/types/User";
+
 interface LoginResponse {
   user_token: string;
 }
@@ -34,6 +36,17 @@ export async function registerUser(
         username: login,
         password: password,
       }),
+    })
+  ).json();
+}
+
+export async function getUser(token: string): Promise<User> {
+  return await (
+    await fetch(`${import.meta.env.VITE_API_URL}/user`, {
+      headers: {
+        token: token,
+        "Content-Type": "application/json",
+      },
     })
   ).json();
 }

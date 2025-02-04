@@ -6,7 +6,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Inventory } from "../../static/types/Inventory";
 import { getInventoryById } from "../../utils/requests/inventory";
 import { getInventoryRequest } from "../../utils/requests/get";
-import { useCookies } from 'react-cookie';
+import { useCookies } from "react-cookie";
+import { getUser } from "../../utils/requests/user";
+import { User } from "../../static/types/User";
 
 function reducer(
   state: GetRequestSchema,
@@ -21,11 +23,10 @@ function reducer(
 
 export function GetRequest() {
   const navigate = useNavigate();
-  const [cookies] = useCookies(['SUSI_TOKEN']);
+  const [cookies] = useCookies(["SUSI_TOKEN"]);
 
   const [state, dispatch] = useReducer(reducer, {
     inventoryId: "",
-    username: "",
     description: "",
     amount: 0,
   });
@@ -33,12 +34,20 @@ export function GetRequest() {
   const { id } = useParams();
 
   const [inventory, setInventory] = useState<Inventory>();
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
     getInventoryById(id ?? "")
       .then((inventory) => {
         setInventory(inventory);
-        dispatch({type: 'inventoryId', value: inventory._id});
+        dispatch({ type: "inventoryId", value: inventory.id });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    getUser(cookies.SUSI_TOKEN)
+      .then((user) => {
+        setUser(user);
       })
       .catch((err) => {
         console.log(err);
@@ -49,14 +58,7 @@ export function GetRequest() {
     <Layout>
       <header className={styles.header}>Заявка на получение инвентаря</header>
       <div className={styles.form}>
-        <input
-          type="text"
-          className={styles.input}
-          placeholder="Ваше имя"
-          onChange={(evt) =>
-            dispatch({ type: "username", value: evt.target.value })
-          }
-        />
+        {user ? <div className={styles.input}>{user.username}</div> : ""}
         {inventory ? <div className={styles.input}>{inventory.name}</div> : ""}
         {inventory ? (
           <input
@@ -84,16 +86,16 @@ export function GetRequest() {
           className={styles.btn}
           onClick={() => {
             if (
+              user &&
               inventory &&
               state.amount > 0 &&
               state.amount <= inventory.amount &&
-              state.username &&
               state.description &&
               state.inventoryId
             ) {
               getInventoryRequest(cookies.SUSI_TOKEN, state)
                 .then(() => {
-                  navigate('/');
+                  navigate("/");
                 })
                 .catch((err) => {
                   console.log(err);

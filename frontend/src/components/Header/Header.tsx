@@ -3,11 +3,26 @@ import profileIcon from "../../static/icons/profile.svg";
 import exitIcon from "../../static/icons/exit.svg";
 import { Link, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { useEffect, useState } from "react";
+import { User } from "../../static/types/User";
+import { getUser } from "../../utils/requests/user";
 
 export function Header() {
   const navigate = useNavigate();
 
   const [cookies, , removeCookie] = useCookies(["SUSI_TOKEN"]);
+
+  const [user, setUser] = useState<User>();
+
+  useEffect(() => {
+    getUser(cookies.SUSI_TOKEN)
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   return (
     <header className={styles.header}>
@@ -23,9 +38,9 @@ export function Header() {
             }
           }}
         >
-          {cookies.SUSI_TOKEN ? (
+          {cookies.SUSI_TOKEN && user ? (
             <>
-              <span className={styles.text}>adm_1234</span>
+              <span className={styles.text}>{user.username}</span>
               <img src={profileIcon} alt="" className={styles.icon} />
             </>
           ) : (
@@ -36,7 +51,9 @@ export function Header() {
           <button
             className={styles.btn}
             onClick={() => {
-              removeCookie("SUSI_TOKEN");
+              removeCookie("SUSI_TOKEN", {
+                path: "/",
+              });
               navigate("/login");
             }}
           >

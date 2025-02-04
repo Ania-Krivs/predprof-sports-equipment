@@ -12,7 +12,6 @@ export async function getInventoryRequest(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: request.username,
         inventory_id: request.inventoryId,
         amount: request.amount,
         use_purpose: request.description,

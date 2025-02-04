@@ -16,8 +16,8 @@ export function Equipment({equipment}: {equipment: Inventory}) {
         </div>
         <div className={styles.amount}>Количество: {equipment.amount} шт.</div>
         <div className={styles.btns}>
-          <Link to={`/get/${equipment._id}`} className={styles.btn}>Получить</Link>
-          <Link to={`/repair/${equipment._id}`} className={styles.btn}>Ремонт</Link>
+          <Link to={`/get/${equipment.id}`} className={styles.btn}>Получить</Link>
+          <Link to={`/repair/${equipment.id}`} className={styles.btn}>Ремонт</Link>
         </div>
       </div>
     </div>

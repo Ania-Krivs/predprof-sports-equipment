@@ -7,6 +7,8 @@ import { getInventoryById } from "../../utils/requests/inventory";
 import { Inventory } from "../../static/types/Inventory";
 import { repairInventoryRequest } from '../../utils/requests/repair';
 import { useCookies } from 'react-cookie';
+import { getUser } from '../../utils/requests/user';
+import { User } from '../../static/types/User';
 
 function reducer(
   state: RepairRequestSchema,
@@ -24,37 +26,37 @@ export function RepairRequest() {
 
   const [state, dispatch] = useReducer(reducer, {
     inventoryId: "",
-    username: "",
     description: "",
   });
 
   const { id } = useParams();
 
   const [inventory, setInventory] = useState<Inventory>();
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
     getInventoryById(id ?? "")
       .then((inventory) => {
         setInventory(inventory);
-        dispatch({type: 'inventoryId', value: inventory._id});
+        dispatch({type: 'inventoryId', value: inventory.id});
       })
       .catch((err) => {
         console.log(err);
       });
+        getUser(cookies.SUSI_TOKEN)
+          .then((user) => {
+            setUser(user);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
   }, []);
 
   return (
     <Layout>
       <header className={styles.header}>Заявка на ремонт инвентаря</header>
       <div className={styles.form}>
-        <input
-          type="text"
-          className={styles.input}
-          placeholder="Ваше имя"
-          onChange={(evt) =>
-            dispatch({ type: "username", value: evt.target.value })
-          }
-        />
+        {user ? <div className={styles.input}>{user.username}</div> : ""}
         {inventory ? <div className={styles.input}>{inventory.name}</div> : ""}
         <textarea
           className={styles.input + " " + styles.textarea}
@@ -68,7 +70,6 @@ export function RepairRequest() {
           onClick={() => {
             if (
               inventory &&
-              state.username &&
               state.description &&
               state.inventoryId
             ) {

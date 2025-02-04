@@ -51,7 +51,9 @@ export function Login() {
                 loginUser(login, password)
                   .then((token) => {
                     if (token.user_token) {
-                      setCookie("SUSI_TOKEN", token.user_token);
+                      setCookie("SUSI_TOKEN", token.user_token, {
+                        path: "/",
+                      });
                       navigate("/");
                     }
                   })
