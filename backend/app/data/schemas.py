@@ -133,3 +133,14 @@ class User(BaseModel):
     id: str
     username: str
     inventory: List[Optional[Inventory]] = []
+    
+class RequestInventory(BaseModel):
+    name: str
+    amount: int
+    used_by_user: List[str]
+    image: Optional[str] = Field(None)
+    description: str
+
+    state: InventoryStatus
+    updated_at: str
+    created_at: str

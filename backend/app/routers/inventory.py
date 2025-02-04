@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+from typing import Optional, List
 from app.data.models import Inventory
 from app.data import schemas
 from datetime import datetime
@@ -41,7 +43,7 @@ async def update_inventory_by_id(update_data: schemas.SInventoryUpdateData) -> d
     inventory.updated_at = str(datetime.now())
 
     await inventory.save()
-    return {"ok": True, "id": str(update_data.id)}
+    return {"id": str(update_data.id)}
 
 
 @inventory_router.patch("/update_image")
@@ -63,7 +65,7 @@ async def update_image(inventory_id: Annotated[str, Header()], token: Annotated[
     inventory.image = image["image_link"]
     await inventory.save()
 
-    return {"ok": True, "image_link": image["image_link"], "file_name": f"{image['file_name']}.{extension}",
+    return {"image_link": image["image_link"], "file_name": f"{image['file_name']}.{extension}",
             "id": str(inventory.id)}
 
 
@@ -79,7 +81,7 @@ async def add_inventory(add_data: schemas.SInventoryAddData) -> dict:
                           created_at=str(datetime.now()))
 
     await inventory.create()
-    return {"ok": True, "id": str((await Inventory.find_one(add_data.name == Inventory.name)).id)}
+    return {"id": str((await Inventory.find_one(add_data.name == Inventory.name)).id)}
 
 
 @inventory_router.post("/add_inventory_to_user")
@@ -99,19 +101,33 @@ async def add_inventory_to_user(add_data: schemas.SAddInventoryToUser) -> dict:
 
     user.equipment.append(inventory)
 
-    return {"ok": True, "user_id": str(user.id), "id": str(inventory.id)}
+    return {"user_id": str(user.id), "id": str(inventory.id)}
 
 
 @inventory_router.get("/all_inventory/")
-async def get_all_inventory(filter_by: str = ""):
-    if not filter_by:
-        return await Inventory.find_all().to_list()
+async def get_all_inventory(filter_by: Optional[str] = None) -> List[schemas.RequestInventory]:
 
-    return await Inventory.find(Inventory.name == filter_by).to_list()
+    if filter_by:
+        inventories = await Inventory.find({"name": filter_by}).to_list()
+    else:
+        inventories = await Inventory.find_all().to_list()
+
+    return [schemas.RequestInventory(
+        name=inventory.name,
+        amount=inventory.amount,
+        used_by_user=inventory.used_by_user,
+        image=inventory.image,
+        description=inventory.description,
+        state=inventory.state,
+        updated_at=inventory.updated_at,
+        created_at=inventory.created_at
+    )
+       for inventory in inventories     
+    ]
 
 
 @inventory_router.get("/all_user_inventory/{user_id}")
-async def get_all_user_inventory(user_id: str) -> list:
+async def get_all_user_inventory(user_id: str) -> schemas.RequestInventory:
     user = redis.get(user_id)
 
     if not user:
@@ -122,9 +138,31 @@ async def get_all_user_inventory(user_id: str) -> list:
     for inventory_id in user.equipment:
         inventory.append(await Inventory.find_one(Inventory.id == inventory_id))
 
-    return inventory
+    return schemas.RequestInventory(
+        name=inventory.name,
+        amount=inventory.amount,
+        used_by_user=inventory.used_by_user,
+        image=inventory.image,
+        description=inventory.description,
+        state=inventory.state,
+        updated_at=inventory.updated_at,
+        created_at=inventory.created_at
+    )
 
 
 @inventory_router.get("/{inventory_id}")
-async def get_inventory_id(inventory_id: str):
-    return await Inventory.find_one(ObjectId(inventory_id) == Inventory.id)
+async def get_inventory_id(inventory_id: str) -> schemas.RequestInventory:
+    inventory = await Inventory.find_one(ObjectId(inventory_id) == Inventory.id)
+    if not inventory:
+        raise HTTPException(404, "Inventory not found")
+    
+    return schemas.RequestInventory(
+        name=inventory.name,
+        amount=inventory.amount,
+        used_by_user=inventory.used_by_user,
+        image=inventory.image,
+        description=inventory.description,
+        state=inventory.state,
+        updated_at=inventory.updated_at,
+        created_at=inventory.created_at
+    )
