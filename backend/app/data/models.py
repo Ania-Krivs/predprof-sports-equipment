@@ -65,7 +65,7 @@ class InventoryPlan(Document):
 class InventoryRepair(Document):
     user: Link[User]
     inventory: Link[Inventory]
-    describtion: str
+    description: str
     status: StatusInventoryRepair
 
 

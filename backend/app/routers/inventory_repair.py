@@ -27,7 +27,7 @@ async def create_application_for_inventory_repair(token: Annotated[str, Header()
     inventory_repair = InventoryRepair(
         user=user,
         inventory=inventory,
-        describtion=request.describtion,
+        description=request.description,
         status=request.status
     )
     await inventory_repair.save()
@@ -36,7 +36,7 @@ async def create_application_for_inventory_repair(token: Annotated[str, Header()
         id=str(inventory_repair.id),
         user=user,
         inventory=inventory,
-        describtion=inventory_repair.describtion,
+        description=inventory_repair.description,
         status=inventory_repair.status
     )
     
@@ -58,7 +58,7 @@ async def get_application_for_inventory_repair(admin_token: str, application_id:
         id=str(inventory_repair.id),
         user=inventory_repair.user,
         inventory=inventory_repair.inventory,
-        describtion=inventory_repair.describtion,
+        description=inventory_repair.description,
         status=inventory_repair.status
     )
     
@@ -80,7 +80,7 @@ async def get_application_for_inventory_repair(admin_token: str) -> List[schemas
         id=str(inventory_repair.id),
         user=inventory_repair.user,
         inventory=inventory_repair.inventory,
-        describtion=inventory_repair.describtion,
+        description=inventory_repair.description,
         status=inventory_repair.status
     )
         for inventory_repair in inventory_repairs

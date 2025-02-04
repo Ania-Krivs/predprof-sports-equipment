@@ -29,7 +29,6 @@ class SInventoryAddData(BaseModel):
 
 
 class RequestInventoryApplication(BaseModel):
-    name: str
     inventory_id: str
     amount: int
     use_purpose: Optional[str] = None
@@ -129,3 +128,8 @@ class Statistic(BaseModel):
     inventory_repair: int
     need_to_replace: int
     broken: int
+
+class User(BaseModel):
+    id: str
+    username: str
+    inventory: List[Optional[Inventory]] = []
