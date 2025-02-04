@@ -1,0 +1,39 @@
+.header {
+  width: 100%;
+  text-transform: uppercase;
+  font-size: 24px;
+}
+
+.form {
+  width: 40%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.input {
+  all: unset;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  width: 100%;
+  padding: 10px;
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 10px;
+}
+
+.btn {
+  all: unset;
+  text-transform: uppercase;
+  padding: 10px 15px;
+  background-color: #fff;
+  color: #000000;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btns {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
