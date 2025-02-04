@@ -113,6 +113,7 @@ async def get_all_inventory(filter_by: Optional[str] = None) -> List[schemas.Req
         inventories = await Inventory.find_all().to_list()
 
     return [schemas.RequestInventory(
+        id=str(inventory.id),
         name=inventory.name,
         amount=inventory.amount,
         used_by_user=inventory.used_by_user,
@@ -139,6 +140,7 @@ async def get_all_user_inventory(user_id: str) -> schemas.RequestInventory:
         inventory.append(await Inventory.find_one(Inventory.id == inventory_id))
 
     return schemas.RequestInventory(
+        id=str(inventory.id),
         name=inventory.name,
         amount=inventory.amount,
         used_by_user=inventory.used_by_user,
@@ -157,6 +159,7 @@ async def get_inventory_id(inventory_id: str) -> schemas.RequestInventory:
         raise HTTPException(404, "Inventory not found")
     
     return schemas.RequestInventory(
+        id=str(inventory.id),
         name=inventory.name,
         amount=inventory.amount,
         used_by_user=inventory.used_by_user,
