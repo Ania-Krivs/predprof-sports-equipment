@@ -3,7 +3,7 @@ import { Layout } from "../../components/Layout/Layout";
 import { useState } from "react";
 import { loginUser, registerUser } from "../../utils/requests/user";
 import { useNavigate } from "react-router-dom";
-import { useCookies } from 'react-cookie';
+import { useCookies } from "react-cookie";
 
 export function Login() {
   const navigate = useNavigate();
@@ -39,8 +39,10 @@ export function Login() {
               if (regMode) {
                 registerUser(login, password)
                   .then((token) => {
-                    setCookie('SUSI_TOKEN', token.user_token);
-                    navigate('/');
+                    if (token.user_token) {
+                      setCookie("SUSI_TOKEN", token.user_token);
+                      navigate("/");
+                    }
                   })
                   .catch((err) => {
                     console.log(err);
@@ -48,8 +50,10 @@ export function Login() {
               } else {
                 loginUser(login, password)
                   .then((token) => {
-                    setCookie('SUSI_TOKEN', token.user_token);
-                    navigate('/');
+                    if (token.user_token) {
+                      setCookie("SUSI_TOKEN", token.user_token);
+                      navigate("/");
+                    }
                   })
                   .catch((err) => {
                     console.log(err);

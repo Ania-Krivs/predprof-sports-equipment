@@ -1,12 +1,12 @@
 export interface GetRequestSchema {
+  inventoryId: string;
   username: string;
-  equipment: string;
-  amount: number;
   description: string;
+  amount: number;
 }
 
 export interface RepairRequestSchema {
+  inventoryId: string;
   username: string;
-  equipment: string;
   description: string;
 }

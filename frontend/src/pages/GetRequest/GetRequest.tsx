@@ -2,9 +2,11 @@ import styles from "./GetRequest.module.scss";
 import { Layout } from "../../components/Layout/Layout";
 import { useEffect, useReducer, useState } from "react";
 import { GetRequestSchema } from "../../static/types/Requests";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Inventory } from "../../static/types/Inventory";
 import { getInventoryById } from "../../utils/requests/inventory";
+import { getInventoryRequest } from "../../utils/requests/get";
+import { useCookies } from 'react-cookie';
 
 function reducer(
   state: GetRequestSchema,
@@ -18,11 +20,14 @@ function reducer(
 }
 
 export function GetRequest() {
+  const navigate = useNavigate();
+  const [cookies] = useCookies(['SUSI_TOKEN']);
+
   const [state, dispatch] = useReducer(reducer, {
+    inventoryId: "",
     username: "",
-    equipment: "",
-    amount: 0,
     description: "",
+    amount: 0,
   });
 
   const { id } = useParams();
@@ -33,6 +38,7 @@ export function GetRequest() {
     getInventoryById(id ?? "")
       .then((inventory) => {
         setInventory(inventory);
+        dispatch({type: 'inventoryId', value: inventory._id});
       })
       .catch((err) => {
         console.log(err);
@@ -52,15 +58,21 @@ export function GetRequest() {
           }
         />
         {inventory ? <div className={styles.input}>{inventory.name}</div> : ""}
-        <input
-          type="number"
-          placeholder="Количество"
-          className={styles.input + " " + styles.input_short}
-          defaultValue={0}
-          onChange={(evt) =>
-            dispatch({ type: "amount", value: evt.target.value })
-          }
-        />
+        {inventory ? (
+          <input
+            type="number"
+            placeholder="Количество"
+            className={styles.input + " " + styles.input_short}
+            defaultValue={1}
+            onChange={(evt) =>
+              dispatch({ type: "amount", value: evt.target.value })
+            }
+            min={1}
+            max={inventory.amount}
+          />
+        ) : (
+          ""
+        )}
         <textarea
           className={styles.input + " " + styles.textarea}
           placeholder="Цель использования"
@@ -68,7 +80,29 @@ export function GetRequest() {
             dispatch({ type: "description", value: evt.target.value })
           }
         ></textarea>
-        <button className={styles.btn}>Отправить</button>
+        <button
+          className={styles.btn}
+          onClick={() => {
+            if (
+              inventory &&
+              state.amount > 0 &&
+              state.amount <= inventory.amount &&
+              state.username &&
+              state.description &&
+              state.inventoryId
+            ) {
+              getInventoryRequest(cookies.SUSI_TOKEN, state)
+                .then(() => {
+                  navigate('/');
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+          }}
+        >
+          Отправить
+        </button>
       </div>
     </Layout>
   );

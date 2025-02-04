@@ -7,7 +7,7 @@ export async function loginUser(
   password: string
 ): Promise<LoginResponse> {
   return await (
-    await fetch(`${import.meta.env.VITE_API_URL}/user/login`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/user/log_in`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
