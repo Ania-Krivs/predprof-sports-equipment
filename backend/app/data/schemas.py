@@ -113,14 +113,14 @@ class UpdateInventoryPlan(BaseModel):
     
 class RequestInventoryRepair(BaseModel):
     inventory_id: str
-    describtion: str
+    description: str
     status: int = Field(description="REPAIR = 0, REPLACING = 1")
     
 class ResponseInventoryRepair(BaseModel):
     id: str
     user: User
     inventory: Inventory
-    describtion: str
+    description: str
     status: int = Field(description="REPAIR = 0, REPLACING = 1")
     
 class Statistic(BaseModel):
