@@ -1,7 +1,7 @@
 import { InventoryStatus } from "./Status";
 
 export interface Inventory {
-  id: string;
+  _id: string;
   name: string;
   amount: number;
   used_by_user_ids: string[];

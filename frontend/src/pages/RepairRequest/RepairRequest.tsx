@@ -38,7 +38,7 @@ export function RepairRequest() {
     getInventoryById(id ?? "")
       .then((inventory) => {
         setInventory(inventory);
-        dispatch({type: 'inventoryId', value: inventory.id});
+        dispatch({type: 'inventoryId', value: inventory._id});
       })
       .catch((err) => {
         console.log(err);

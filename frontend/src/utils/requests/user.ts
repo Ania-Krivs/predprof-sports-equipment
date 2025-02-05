@@ -45,7 +45,6 @@ export async function getUser(token: string): Promise<User> {
     await fetch(`${import.meta.env.VITE_API_URL}/user`, {
       headers: {
         token: token,
-        "Content-Type": "application/json",
       },
     })
   ).json();

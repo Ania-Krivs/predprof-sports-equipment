@@ -2,8 +2,12 @@ import styles from "./Equipment.module.scss";
 import { Inventory } from "../../static/types/Inventory";
 import { states } from '../../static/data/states';
 import { Link } from 'react-router-dom';
+import { GetRequestResponse } from '../../static/types/Requests';
 
-export function Equipment({equipment}: {equipment: Inventory}) {
+export function Equipment({equipment, request}: {equipment: Inventory, request?: GetRequestResponse}) {
+
+  console.log(request);
+
   return (
     <div className={styles.equipment}>
       <img src={`${import.meta.env.VITE_API_URL}/${equipment.image}`} alt="" className={styles.image} />
@@ -16,8 +20,8 @@ export function Equipment({equipment}: {equipment: Inventory}) {
         </div>
         <div className={styles.amount}>Количество: {equipment.amount} шт.</div>
         <div className={styles.btns}>
-          <Link to={`/get/${equipment.id}`} className={styles.btn}>Получить</Link>
-          <Link to={`/repair/${equipment.id}`} className={styles.btn}>Ремонт</Link>
+          <Link to={`/get/${equipment._id}`} className={styles.btn}>Получить</Link>
+          <Link to={`/repair/${equipment._id}`} className={styles.btn}>Ремонт</Link>
         </div>
       </div>
     </div>

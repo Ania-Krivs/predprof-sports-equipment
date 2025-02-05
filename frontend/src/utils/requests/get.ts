@@ -1,6 +1,9 @@
-import { GetRequestSchema } from "../../static/types/Requests";
+import {
+  GetRequestResponse,
+  GetRequestSchema,
+} from "../../static/types/Requests";
 
-export async function getInventoryRequest(
+export async function invokeGetInventoryRequest(
   token: string,
   request: GetRequestSchema
 ) {
@@ -17,5 +20,20 @@ export async function getInventoryRequest(
         use_purpose: request.description,
       }),
     })
+  ).json();
+}
+
+export async function getInventoryRequests(
+  token: string
+): Promise<GetRequestResponse[]> {
+  return await (
+    await fetch(
+      `${import.meta.env.VITE_API_URL}/inventory_application/user/${token}`,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    )
   ).json();
 }

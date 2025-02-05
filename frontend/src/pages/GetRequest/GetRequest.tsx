@@ -5,7 +5,7 @@ import { GetRequestSchema } from "../../static/types/Requests";
 import { useNavigate, useParams } from "react-router-dom";
 import { Inventory } from "../../static/types/Inventory";
 import { getInventoryById } from "../../utils/requests/inventory";
-import { getInventoryRequest } from "../../utils/requests/get";
+import { invokeGetInventoryRequest } from "../../utils/requests/get";
 import { useCookies } from "react-cookie";
 import { getUser } from "../../utils/requests/user";
 import { User } from "../../static/types/User";
@@ -40,7 +40,7 @@ export function GetRequest() {
     getInventoryById(id ?? "")
       .then((inventory) => {
         setInventory(inventory);
-        dispatch({ type: "inventoryId", value: inventory.id });
+        dispatch({ type: "inventoryId", value: inventory._id });
       })
       .catch((err) => {
         console.log(err);
@@ -93,7 +93,7 @@ export function GetRequest() {
               state.description &&
               state.inventoryId
             ) {
-              getInventoryRequest(cookies.SUSI_TOKEN, state)
+              invokeGetInventoryRequest(cookies.SUSI_TOKEN, state)
                 .then(() => {
                   navigate("/");
                 })

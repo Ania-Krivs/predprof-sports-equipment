@@ -1,7 +1,7 @@
 import { Inventory } from './Inventory';
 
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   inventory: Inventory[];
 }
