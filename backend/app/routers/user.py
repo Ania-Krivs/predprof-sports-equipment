@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Header
-from typing import Annotated
+from typing import Annotated, Dict
 from app.data import schemas
 from app.data.models import User
 from app.utils.auth import create_user, authenticate_user
@@ -40,7 +40,7 @@ async def log_in_user(request: schemas.RequestLogInUser) -> schemas.ResponseUser
     
 
 @router.get("/")
-async def get_user(token: Annotated[str, Header()]) -> schemas.User:
+async def get_user(token: Annotated[str, Header()]) -> Dict:
     username = redis.get(token)
     if not username:
         raise HTTPException(401, "Token invalid")
@@ -49,9 +49,5 @@ async def get_user(token: Annotated[str, Header()]) -> schemas.User:
     if not user:
         raise HTTPException(404, "User not found")
     
-    return schemas.User(
-        id=str(user.id),
-        username=user.username,
-        inventory=user.inventory
-    )
+    return {"_id": str(user.id), "username": user.username, "inventory": user.inventory }
     

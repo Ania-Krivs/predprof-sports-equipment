@@ -11,7 +11,7 @@ router = APIRouter(prefix="/inventory_repair", tags=["Inventory Repair"])
 
 @router.post("/")
 async def create_application_for_inventory_repair(token: Annotated[str, Header()],
-                                       request: schemas.RequestInventoryRepair) -> schemas.ResponseInventoryRepair:
+                                       request: schemas.RequestInventoryRepair):
     username = redis.get(token)
     if not username:
         raise HTTPException(401, "Token invalid")
@@ -32,16 +32,15 @@ async def create_application_for_inventory_repair(token: Annotated[str, Header()
     )
     await inventory_repair.save()
 
-    return schemas.ResponseInventoryRepair(
-        id=str(inventory_repair.id),
-        user=user,
-        inventory=inventory,
-        description=inventory_repair.description,
-        status=inventory_repair.status
-    )
+    return {"_id":str(inventory_repair.id),
+        "user":user,
+        "inventory":inventory,
+        "description":inventory_repair.description,
+        "status":inventory_repair.status
+        }
     
 @router.get("/{admin_token}")
-async def get_application_for_inventory_repair(admin_token: str, application_id: str) -> schemas.ResponseInventoryRepair:
+async def get_application_for_inventory_repair(admin_token: str, application_id: str):
     username = redis.get(admin_token)
     if not username:
         raise HTTPException(401, "Token invalid")
@@ -54,16 +53,10 @@ async def get_application_for_inventory_repair(admin_token: str, application_id:
     if not inventory_repair:
         raise HTTPException(404, "Application not found")
 
-    return schemas.ResponseInventoryRepair(
-        id=str(inventory_repair.id),
-        user=inventory_repair.user,
-        inventory=inventory_repair.inventory,
-        description=inventory_repair.description,
-        status=inventory_repair.status
-    )
+    return inventory_repair
     
 @router.get("/all/{admin_token}")
-async def get_application_for_inventory_repair(admin_token: str) -> List[schemas.ResponseInventoryRepair]:
+async def get_application_for_inventory_repair(admin_token: str) -> List:
     username = redis.get(admin_token)
     if not username:
         raise HTTPException(401, "Token invalid")
@@ -76,14 +69,8 @@ async def get_application_for_inventory_repair(admin_token: str) -> List[schemas
     if not inventory_repairs:
         raise HTTPException(404, "Applications not found")
 
-    return [schemas.ResponseInventoryRepair(
-        id=str(inventory_repair.id),
-        user=inventory_repair.user,
-        inventory=inventory_repair.inventory,
-        description=inventory_repair.description,
-        status=inventory_repair.status
-    )
-        for inventory_repair in inventory_repairs
+    return [
+       inventory_repair for inventory_repair in inventory_repairs
     ]
     
 @router.delete("/{admin_token}")

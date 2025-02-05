@@ -8,7 +8,7 @@ from app.routers.user import redis
 router = APIRouter(prefix="/inventory_plan", tags=["Inventory Plan"])
 
 @router.post("/")
-async def create_inventory_plan(admin_token: Annotated[str, Header()], request: schemas.CreateInventoryPlan) -> schemas.ResponseCreateInventoryPlan:
+async def create_inventory_plan(admin_token: Annotated[str, Header()], request: schemas.CreateInventoryPlan):
     username = redis.get(admin_token)
     if not username:
         raise HTTPException(401, "Token invalid")
@@ -24,16 +24,11 @@ async def create_inventory_plan(admin_token: Annotated[str, Header()], request: 
     )
     await inventory_plan.create()
     
-    return schemas.ResponseCreateInventoryPlan(
-        id=str(inventory_plan.id),
-        name=inventory_plan.name,
-        manufacturer=inventory_plan.manufacturer,
-        price=inventory_plan.price
-    )
+    return inventory_plan
 
 
-@router.get("/{inventory_plan_id}")
-async def get_inventory_plan_by_id(admin_token: Annotated[str, Header()], inventory_plan_id: str) -> schemas.ResponseCreateInventoryPlan:
+@router.get("/aaa/{inventory_plan_id}")
+async def get_inventory_plan_by_id(admin_token: Annotated[str, Header()], inventory_plan_id: str):
     username = redis.get(admin_token)
     if not username:
         raise HTTPException(401, "Token invalid")
@@ -46,16 +41,11 @@ async def get_inventory_plan_by_id(admin_token: Annotated[str, Header()], invent
     if not inventory_plan:
         raise HTTPException(404, "Plan not found")
 
-    return schemas.ResponseCreateInventoryPlan(
-        id=str(inventory_plan.id),
-        name=inventory_plan.name,
-        manufacturer=inventory_plan.manufacturer,
-        price=inventory_plan.price
-    )
+    return inventory_plan
 
 
 @router.get("/all")
-async def get_inventory_plan(admin_token: Annotated[str, Header()]) -> List[schemas.ResponseCreateInventoryPlan]:
+async def get_inventory_plan(admin_token: Annotated[str, Header()]) -> List:
     username = redis.get(admin_token)
     if not username:
         raise HTTPException(401, "Token invalid")
@@ -68,17 +58,12 @@ async def get_inventory_plan(admin_token: Annotated[str, Header()]) -> List[sche
     if not inventory_plans:
         raise HTTPException(404, "Plans not found")
 
-    return [schemas.ResponseCreateInventoryPlan(
-        id=str(inventory_plan.id),
-        name=inventory_plan.name,
-        manufacturer=inventory_plan.manufacturer,
-        price=inventory_plan.price
-    )
-        for inventory_plan in inventory_plans
+    return [
+       inventory_plan for inventory_plan in inventory_plans
     ]
     
 @router.patch("/status/{inventory_plan_id}")
-async def update_inventory_plan(admin_token: Annotated[str, Header()], inventory_plan_id: str, request: schemas.UpdateInventoryPlan) -> schemas.ResponseCreateInventoryPlan:
+async def update_inventory_plan(admin_token: Annotated[str, Header()], inventory_plan_id: str, request: schemas.UpdateInventoryPlan):
     username = redis.get(admin_token)
     if not username:
         raise HTTPException(401, "Token invalid")
@@ -97,12 +82,7 @@ async def update_inventory_plan(admin_token: Annotated[str, Header()], inventory
         
     await inventory_plan.save()
         
-    return schemas.ResponseCreateInventoryPlan(
-        id=str(inventory_plan.id),
-        name=inventory_plan.name,
-        manufacturer=inventory_plan.manufacturer,
-        price=inventory_plan.price
-    )
+    return inventory_plan
 
     
 @router.delete("/{inventory_plan_id}")

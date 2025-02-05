@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from typing import Optional, List
-from app.data.models import Inventory
+from app.data.models import Inventory, User
 from app.data import schemas
 from datetime import datetime
 from app.exceptions import InventoryAlreadyExisted, InventoryNotFound, UserNotFound, NotEnoughInventory
@@ -43,7 +43,7 @@ async def update_inventory_by_id(update_data: schemas.SInventoryUpdateData) -> d
     inventory.updated_at = str(datetime.now())
 
     await inventory.save()
-    return {"id": str(update_data.id)}
+    return {"_id": str(update_data.id)}
 
 
 @inventory_router.patch("/update_image")
@@ -66,7 +66,7 @@ async def update_image(inventory_id: Annotated[str, Header()], token: Annotated[
     await inventory.save()
 
     return {"image_link": image["image_link"], "file_name": f"{image['file_name']}.{extension}",
-            "id": str(inventory.id)}
+            "_id": str(inventory.id)}
 
 
 @inventory_router.post("/add_inventory")
@@ -81,7 +81,7 @@ async def add_inventory(add_data: schemas.SInventoryAddData) -> dict:
                           created_at=str(datetime.now()))
 
     await inventory.create()
-    return {"id": str((await Inventory.find_one(add_data.name == Inventory.name)).id)}
+    return {"_id": str((await Inventory.find_one(add_data.name == Inventory.name)).id)}
 
 
 @inventory_router.post("/add_inventory_to_user")
@@ -101,71 +101,44 @@ async def add_inventory_to_user(add_data: schemas.SAddInventoryToUser) -> dict:
 
     user.equipment.append(inventory)
 
-    return {"user_id": str(user.id), "id": str(inventory.id)}
+    return {"user_id": str(user.id), "_id": str(inventory.id)}
 
 
 @inventory_router.get("/all_inventory/")
-async def get_all_inventory(filter_by: Optional[str] = None) -> List[schemas.RequestInventory]:
+async def get_all_inventory(filter_by: Optional[str] = None):
 
     if filter_by:
         inventories = await Inventory.find({"name": filter_by}).to_list()
     else:
         inventories = await Inventory.find_all().to_list()
 
-    return [schemas.RequestInventory(
-        id=str(inventory.id),
-        name=inventory.name,
-        amount=inventory.amount,
-        used_by_user=inventory.used_by_user,
-        image=inventory.image,
-        description=inventory.description,
-        state=inventory.state,
-        updated_at=inventory.updated_at,
-        created_at=inventory.created_at
-    )
-       for inventory in inventories     
-    ]
+    return [inventory for inventory in inventories]
 
 
-@inventory_router.get("/all_user_inventory/{user_id}")
-async def get_all_user_inventory(user_id: str) -> schemas.RequestInventory:
-    user = redis.get(user_id)
+@inventory_router.get("/all_user_inventory/{token}")
+async def get_all_user_inventory(token: str):
+    username = redis.get(token)
+    if not username:
+        raise HTTPException(401, "Token invalid")
 
+    user = await User.find_one(User.username == username.decode("utf-8"))
     if not user:
-        raise UserNotFound
+        raise HTTPException(404, "User not found")
 
-    inventory = []
+    inventories = []
 
-    for inventory_id in user.equipment:
-        inventory.append(await Inventory.find_one(Inventory.id == inventory_id))
+    for inventory_id in user.inventory:
+        inventory = await Inventory.find_one(Inventory.id == inventory_id)
+        if inventory:
+            inventories.append(inventory)
 
-    return schemas.RequestInventory(
-        id=str(inventory.id),
-        name=inventory.name,
-        amount=inventory.amount,
-        used_by_user=inventory.used_by_user,
-        image=inventory.image,
-        description=inventory.description,
-        state=inventory.state,
-        updated_at=inventory.updated_at,
-        created_at=inventory.created_at
-    )
+    return inventories
 
 
 @inventory_router.get("/{inventory_id}")
-async def get_inventory_id(inventory_id: str) -> schemas.RequestInventory:
+async def get_inventory_id(inventory_id: str):
     inventory = await Inventory.find_one(ObjectId(inventory_id) == Inventory.id)
     if not inventory:
         raise HTTPException(404, "Inventory not found")
     
-    return schemas.RequestInventory(
-        id=str(inventory.id),
-        name=inventory.name,
-        amount=inventory.amount,
-        used_by_user=inventory.used_by_user,
-        image=inventory.image,
-        description=inventory.description,
-        state=inventory.state,
-        updated_at=inventory.updated_at,
-        created_at=inventory.created_at
-    )
+    return inventory

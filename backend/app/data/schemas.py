@@ -6,7 +6,7 @@ from typing import List, Optional
 
 
 class SInventoryId(BaseModel):
-    id: str = Field(description="ID инвентаря")
+    _id: str 
 
 
 class SInventoryUpdateData(SInventoryId):
@@ -71,7 +71,7 @@ class ResponseInventoryRequest(BaseModel):
 
 
 class ResponseGetInventoryApplication(BaseModel):
-    id: str
+    _id: str
     user: User
     inventory: Inventory
     quantity: int
@@ -101,7 +101,7 @@ class CreateInventoryPlan(BaseModel):
     price: float
     
 class ResponseCreateInventoryPlan(BaseModel):
-    id: str
+    _id: str
     name: str
     manufacturer: str
     price: float
@@ -117,7 +117,7 @@ class RequestInventoryRepair(BaseModel):
     status: int = Field(description="REPAIR = 0, REPLACING = 1")
     
 class ResponseInventoryRepair(BaseModel):
-    id: str
+    _id: str
     user: User
     inventory: Inventory
     description: str
@@ -130,12 +130,12 @@ class Statistic(BaseModel):
     broken: int
 
 class User(BaseModel):
-    id: str
+    _id: str
     username: str
     inventory: List[Optional[Inventory]] = []
     
 class RequestInventory(BaseModel):
-    id: str
+    _id: str
     name: str
     amount: int
     used_by_user: List[str]
