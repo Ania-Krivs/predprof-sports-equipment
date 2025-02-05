@@ -135,6 +135,7 @@ class User(BaseModel):
     inventory: List[Optional[Inventory]] = []
     
 class RequestInventory(BaseModel):
+    id: str
     name: str
     amount: int
     used_by_user: List[str]
