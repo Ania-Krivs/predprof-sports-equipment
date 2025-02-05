@@ -18,8 +18,8 @@ class SInventoryUpdateData(SInventoryId):
 
 
 class SAddInventoryToUser(SInventoryId):
-    user_id: str = Field(default="ID пользователя")
-
+    inventory_id: str 
+    amount: int
 
 class SInventoryAddData(BaseModel):
     name: str = Field(description="Название инвентаря")

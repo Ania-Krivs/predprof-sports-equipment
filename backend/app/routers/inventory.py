@@ -84,14 +84,17 @@ async def add_inventory(add_data: schemas.SInventoryAddData) -> dict:
     return {"_id": str((await Inventory.find_one(add_data.name == Inventory.name)).id)}
 
 
-@inventory_router.post("/add_inventory_to_user")
-async def add_inventory_to_user(add_data: schemas.SAddInventoryToUser) -> dict:
-    user = redis.get(add_data.user_id)
+@inventory_router.post("/add_inventory_to_user/{token}")
+async def add_inventory_to_user(token: str, add_data: schemas.SAddInventoryToUser) -> dict:
+    username = redis.get(token)
+    if not username:
+        raise HTTPException(401, "Token invalid")
 
+    user = await User.find_one(User.username == username.decode("utf-8"))
     if not user:
-        raise UserNotFound
+        raise HTTPException(404, "User not found")
 
-    inventory = await Inventory.find_one(Inventory.id == ObjectId(add_data.id))
+    inventory = await Inventory.find_one(Inventory.id == ObjectId(add_data.inventory_id))
 
     if not inventory:
         raise InventoryNotFound
@@ -99,7 +102,7 @@ async def add_inventory_to_user(add_data: schemas.SAddInventoryToUser) -> dict:
     if inventory.amount < add_data.amount:
         raise NotEnoughInventory
 
-    user.equipment.append(inventory)
+    user.inventory.append(inventory)
 
     return {"user_id": str(user.id), "_id": str(inventory.id)}
 
