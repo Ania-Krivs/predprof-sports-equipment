@@ -18,6 +18,7 @@ class SInventoryUpdateData(SInventoryId):
 
 
 class SAddInventoryToUser(SInventoryId):
+    user_id: str
     inventory_id: str 
     amount: int
 

@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from typing import Optional, List
-from app.data.models import Inventory, User
+from app.data.models import Inventory, User, Admin
 from app.data import schemas
 from datetime import datetime
 from app.exceptions import InventoryAlreadyExisted, InventoryNotFound, UserNotFound, NotEnoughInventory
@@ -90,10 +90,13 @@ async def add_inventory_to_user(token: str, add_data: schemas.SAddInventoryToUse
     if not username:
         raise HTTPException(401, "Token invalid")
 
-    user = await User.find_one(User.username == username.decode("utf-8"))
+    admin = await Admin.find_one(Admin.username == username.decode("utf-8"))
+    if not admin:
+        raise HTTPException(404, "Admin not found")
+    user = await User.find_one(User.id == str(add_data.user_id))
     if not user:
         raise HTTPException(404, "User not found")
-
+    
     inventory = await Inventory.find_one(Inventory.id == ObjectId(add_data.inventory_id))
 
     if not inventory:
