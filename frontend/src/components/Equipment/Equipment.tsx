@@ -3,13 +3,22 @@ import { Inventory } from "../../static/types/Inventory";
 import { states } from '../../static/data/states';
 import { Link } from 'react-router-dom';
 import { GetRequestResponse } from '../../static/types/Requests';
+import { Status } from '../../static/types/Status';
 
 export function Equipment({equipment, request}: {equipment: Inventory, request?: GetRequestResponse}) {
-
-  console.log(request);
-
   return (
     <div className={styles.equipment}>
+      {
+        request
+        ?
+        <div className={styles.request}>
+          {
+            Status[request.status]
+          }
+        </div>
+        :
+        ''
+      }
       <img src={`${import.meta.env.VITE_API_URL}/${equipment.image}`} alt="" className={styles.image} />
       <div className={styles.info}>
         <div className={styles.name}>

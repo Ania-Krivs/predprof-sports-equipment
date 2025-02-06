@@ -1,6 +1,6 @@
-import { Inventory } from './Inventory';
-import { Status } from './Status';
-import { User } from './User';
+import { Inventory } from "./Inventory";
+import { Status } from "./Status";
+import { User } from "./User";
 
 export interface GetRequestSchema {
   inventoryId: string;

@@ -14,6 +14,8 @@ export function Login() {
   const [login, setLogin] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
   return (
     <Layout>
       <div className={styles.form}>
@@ -48,7 +50,7 @@ export function Login() {
                     console.log(err);
                   });
               } else {
-                loginUser(login, password)
+                loginUser(login, password, isAdmin)
                   .then((token) => {
                     if (token.user_token) {
                       setCookie("SUSI_TOKEN", token.user_token, {
@@ -72,6 +74,8 @@ export function Login() {
             {regMode ? "Вход" : "Регистрация"}
           </button>
         </div>
+        <input type="checkbox" id="isAdmin" onChange={(evt) => setIsAdmin(evt.target.checked)} />
+        <label htmlFor="isAdmin">Как администратор</label>
       </div>
     </Layout>
   );

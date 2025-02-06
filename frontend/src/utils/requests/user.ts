@@ -6,10 +6,11 @@ interface LoginResponse {
 
 export async function loginUser(
   login: string,
-  password: string
+  password: string,
+  admin: boolean
 ): Promise<LoginResponse> {
   return await (
-    await fetch(`${import.meta.env.VITE_API_URL}/user/log_in`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/${admin ? 'admin' : 'user'}/log_in`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

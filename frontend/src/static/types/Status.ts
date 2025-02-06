@@ -1,7 +1,7 @@
 export enum Status {
-  AWAITING,
-  ACCEPTED,
-  CANCELED,
+  "Ожидание",
+  "Принята",
+  "Отклонена",
 }
 
 export enum InventoryStatus {
