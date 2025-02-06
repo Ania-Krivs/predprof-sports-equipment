@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Header
 from typing import Annotated, Dict
 from app.data import schemas
-from app.data.models import User
+from app.data.models import User, Admin
 from app.utils.auth import create_user, authenticate_user
 from app.utils.security import verify_password
 from redis import Redis
@@ -45,9 +45,13 @@ async def get_user(token: Annotated[str, Header()]) -> Dict:
     if not username:
         raise HTTPException(401, "Token invalid")
 
-    user = await User.find_one(User.username == username.decode("utf-8"), fetch_links=True)
-    if not user:
-        raise HTTPException(404, "User not found")
+    admin = await Admin.find_one(Admin.username == username.decode("utf-8"))
+    if admin:
+        return {"_id": str(admin.id), "username": admin.username, "status": "ADMIN"}
     
-    return {"_id": str(user.id), "username": user.username, "inventory": user.inventory }
+    user = await User.find_one(User.username == username.decode("utf-8"), fetch_links=True)
+    if user:
+        return {"_id": str(user.id), "username": user.username, "inventory": user.inventory, "status": "USER" }
+    
+    raise HTTPException(404, "Not fount")
     
