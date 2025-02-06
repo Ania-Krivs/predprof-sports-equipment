@@ -25,7 +25,7 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 
 @router.post("/log_in")
 async def log_in_admin(request: schemas.RequestLogInUser) -> schemas.ResponseAdminLogIn:
-    admin = await Admin.find_one(User.username == request.username)
+    admin = await Admin.find_one(Admin.username == request.username)
     if not admin or not verify_password(request.password, admin.hashed_password):
         raise HTTPException(status_code=404, detail="Incorrect name or password")
 
