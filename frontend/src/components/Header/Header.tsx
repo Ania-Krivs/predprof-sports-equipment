@@ -40,7 +40,11 @@ export function Header() {
         >
           {cookies.SUSI_TOKEN && user ? (
             <>
-              <span className={styles.text}>{user.username}</span>
+              <span className={styles.text} onClick={() => {
+              if (user.status === "ADMIN") {
+                navigate('/admin');
+              }
+            }}>{user.username}</span>
               <img src={profileIcon} alt="" className={styles.icon} />
             </>
           ) : (
