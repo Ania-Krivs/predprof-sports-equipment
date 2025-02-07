@@ -134,7 +134,7 @@ async def update_status(admin_token: str, request: schemas.RequestApplicationUpd
         else:
             user.inventory.append(inventory_)
         
-    await user.save()
+        await user.save()
 
     return inventory_application
 
