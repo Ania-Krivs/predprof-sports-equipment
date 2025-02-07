@@ -7,22 +7,31 @@ import { Inventory } from "../../static/types/Inventory";
 import { getInventoryRequests } from "../../utils/requests/get";
 import { useCookies } from "react-cookie";
 import { GetRequestResponse } from "../../static/types/Requests";
+import { getUser } from "../../utils/requests/user";
+import { useNavigate } from "react-router-dom";
 
 export function Home() {
+  const navigate = useNavigate();
   const [cookies] = useCookies(["SUSI_TOKEN"]);
 
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [requests, setRequests] = useState<GetRequestResponse[]>([]);
 
   useEffect(() => {
-    Promise.all([getInventory(), getInventoryRequests(cookies.SUSI_TOKEN)])
-      .then(([inventory, requests]) => {
-        setInventory(inventory);
-        setRequests(requests);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    getUser(cookies.SUSI_TOKEN).then((user) => {
+      if (user.status === "USER") {
+        Promise.all([getInventory(), getInventoryRequests(cookies.SUSI_TOKEN)])
+          .then(([inventory, requests]) => {
+            setInventory(inventory);
+            setRequests(requests);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else if (user.status === "ADMIN") {
+        navigate("/admin");
+      }
+    });
   }, []);
 
   return (
@@ -32,6 +41,7 @@ export function Home() {
         {inventory.map((inventoryItem, index) => (
           <Equipment
             equipment={inventoryItem}
+            isEditable={false}
             request={requests.find(
               (request) => request.inventory._id === inventoryItem._id
             )}

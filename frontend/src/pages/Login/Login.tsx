@@ -41,8 +41,8 @@ export function Login() {
               if (regMode) {
                 registerUser(login, password)
                   .then((token) => {
-                    if (token.user_token) {
-                      setCookie("SUSI_TOKEN", token.user_token);
+                    if (token) {
+                      setCookie("SUSI_TOKEN", token);
                       navigate("/");
                     }
                   })
@@ -52,8 +52,8 @@ export function Login() {
               } else {
                 loginUser(login, password, isAdmin)
                   .then((token) => {
-                    if (token.user_token) {
-                      setCookie("SUSI_TOKEN", token.user_token, {
+                    if (token) {
+                      setCookie("SUSI_TOKEN", token, {
                         path: "/",
                       });
                       navigate("/");

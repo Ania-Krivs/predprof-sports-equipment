@@ -17,6 +17,11 @@ export interface GetRequestResponse {
   status: Status;
 }
 
+export interface GetRequestStatusUpdate {
+  application_id: string;
+  status: Status;
+}
+
 export interface RepairRequestSchema {
   inventoryId: string;
   description: string;

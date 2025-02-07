@@ -10,6 +10,7 @@ class SInventoryId(BaseModel):
 
 
 class SInventoryUpdateData(SInventoryId):
+    id: str = Field(default="ID предмета")
     user_id: str = Field(default="ID пользователя")
     name: str = Field(description="Название инвентаря")
     amount: int = Field(description="Количество инвентаря")

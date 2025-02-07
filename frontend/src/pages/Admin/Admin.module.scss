@@ -1,0 +1,56 @@
+.header {
+  width: 100%;
+  text-transform: uppercase;
+  font-size: 24px;
+}
+
+.link {
+  width: 100%;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  &:nth-last-child(1) {
+    padding-bottom: 150px;
+  }
+}
+
+.request {
+  background-color: #212039;
+  padding: 15px;
+  border-radius: 15px;
+  gap: 10px;
+}
+
+.field {
+  width: 100%;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.field_name {
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.btns {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.request_btn {
+  all: unset;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  background-color: #fff;
+  color: #000000;
+  border-radius: 10px;
+  cursor: pointer;
+}
