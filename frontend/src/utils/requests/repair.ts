@@ -26,20 +26,22 @@ export async function repairInventoryRequest(
 export async function getAllRepairRequests(
   token: string
 ): Promise<RepairRequestResponse[]> {
-  return await (
-    await fetch(`${import.meta.env.VITE_API_URL}/inventory_repair/all/${token}`)
-  ).json();
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/inventory_repair/all/${token}`
+  );
+  return response.ok ? await response.json() : [];
 }
 
 export async function deleteRepairRequest(token: string, id: string) {
-  return await (
-    await fetch(`${import.meta.env.VITE_API_URL}/inventory_repair/${token}`, {
+  return await (await fetch(
+    `${import.meta.env.VITE_API_URL}/inventory_repair/${token}`,
+    {
       method: "DELETE",
       headers: {
         token: token,
         "application-id": id,
         "Content-Type": "application/json",
       },
-    })
-  ).json();
+    }
+  )).json()
 }
