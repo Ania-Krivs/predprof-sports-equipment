@@ -114,7 +114,7 @@ async def update_status(admin_token: str, request: schemas.RequestApplicationUpd
     
     if int(inventory_application.status) == int(Status.ACCEPTED):
         inventory.amount = (inventory.amount - inventory_application.quantity)
-        await inventory_application.save()
+        await inventory.save()
         
         user = await User.find_one(User.id == ObjectId(inventory_application.user.id))
         inventory_ = Inventory(
