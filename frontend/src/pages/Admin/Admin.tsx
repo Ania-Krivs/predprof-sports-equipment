@@ -19,7 +19,7 @@ export function Admin() {
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [getRequests, setGetRequests] = useState<GetRequestResponse[]>([]);
 
-  useEffect(() => {
+  function renderAdmin() {
     getInventory()
       .then((inventory) => {
         setInventory(inventory);
@@ -34,6 +34,10 @@ export function Admin() {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  useEffect(() => {
+    renderAdmin();
   }, []);
 
   return (
@@ -47,70 +51,71 @@ export function Admin() {
           <Equipment equipment={item} isEditable={true} key={index} />
         ))}
       </div>
-      <header className={styles.header}>Заявки на получение</header>
+      {getRequests.filter((request) => request.status === Status.AWAITING)
+        .length > 0 ? (
+        <header className={styles.header}>Заявки на получение</header>
+      ) : (
+        ""
+      )}
       <div className={styles.list}>
-        {getRequests.map((getRequest, index) => (
-          <div className={styles.request} key={index}>
-            <div className={styles.field + " " + styles.field_name}>
-              {getRequest.inventory.name}
-            </div>
-            <div className={styles.field}>От: {getRequest.user.username}</div>
-            <div className={styles.field}>
-              Количество: {getRequest.quantity} шт.
-            </div>
-            <div className={styles.field}>
-              Цель использования: {getRequest.use_purpose}
-            </div>
-            <div className={styles.btns}>
-              <button
-                className={styles.request_btn}
-                onClick={() => {
-                  updateGetRequestStatus(cookies.SUSI_TOKEN, {
-                    application_id: getRequest._id,
-                    status: Status.CANCELLED,
-                  })
-                    .then(() => {
-                      getAllInventoryRequests()
-                        .then((requests) => {
-                          setGetRequests(requests);
-                        })
-                        .catch((err) => {
-                          console.log(err);
-                        });
+        {getRequests
+          .filter((request) => request.status === Status.AWAITING)
+          .map((getRequest, index) => (
+            <div className={styles.request} key={index}>
+              <div className={styles.field + " " + styles.field_name}>
+                {getRequest.inventory.name}
+              </div>
+              <div className={styles.field}>От: {getRequest.user.username}</div>
+              <div className={styles.field}>
+                Количество: {getRequest.quantity} шт.
+              </div>
+              <div className={styles.field}>
+                Цель использования: {getRequest.use_purpose}
+              </div>
+              <div className={styles.btns}>
+                <button
+                  className={styles.request_btn}
+                  onClick={() => {
+                    updateGetRequestStatus(cookies.SUSI_TOKEN, {
+                      application_id: getRequest._id,
+                      status: Status.CANCELLED,
                     })
-                    .catch((err) => {
-                      console.log(err);
-                    });
-                }}
-              >
-                Отклонить
-              </button>
-              <button
-                className={styles.request_btn}
-                onClick={() => {
-                  updateGetRequestStatus(cookies.SUSI_TOKEN, {
-                    application_id: getRequest._id,
-                    status: Status.ACCEPTED,
-                  })
-                    .then(() => {
-                      getAllInventoryRequests()
-                        .then((requests) => {
-                          setGetRequests(requests);
-                        })
-                        .catch((err) => {
-                          console.log(err);
-                        });
+                      .then(() => {
+                        getAllInventoryRequests()
+                          .then((requests) => {
+                            setGetRequests(requests);
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                          });
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                      });
+                  }}
+                >
+                  Отклонить
+                </button>
+                <button
+                  className={styles.request_btn}
+                  onClick={() => {
+                    updateGetRequestStatus(cookies.SUSI_TOKEN, {
+                      application_id: getRequest._id,
+                      status: Status.ACCEPTED,
                     })
-                    .catch((err) => {
-                      console.log(err);
-                    });
-                }}
-              >
-                Принять
-              </button>
+                      .then(() => {
+                        renderAdmin();
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                      });
+                  }}
+                >
+                  Принять
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </Layout>
   );

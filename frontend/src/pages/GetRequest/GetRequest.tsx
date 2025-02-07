@@ -28,7 +28,7 @@ export function GetRequest() {
   const [state, dispatch] = useReducer(reducer, {
     inventoryId: "",
     description: "",
-    amount: 0,
+    amount: 1,
   });
 
   const { id } = useParams();

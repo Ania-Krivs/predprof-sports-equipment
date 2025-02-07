@@ -42,7 +42,7 @@ export function Home() {
           <Equipment
             equipment={inventoryItem}
             isEditable={false}
-            request={requests.find(
+            request={requests.reverse().find(
               (request) => request.inventory._id === inventoryItem._id
             )}
             key={index}
