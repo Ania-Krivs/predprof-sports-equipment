@@ -27,16 +27,15 @@ export async function invokeGetInventoryRequest(
 export async function getInventoryRequests(
   token: string
 ): Promise<GetRequestResponse[]> {
-  return await (
-    await fetch(
-      `${import.meta.env.VITE_API_URL}/inventory_application/user/${token}`,
-      {
-        headers: {
-          token: token,
-        },
-      }
-    )
-  ).json();
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/inventory_application/user/${token}`,
+    {
+      headers: {
+        token: token,
+      },
+    }
+  );
+  return response.ok ? await response.json() : [];
 }
 
 export async function getAllInventoryRequests(): Promise<GetRequestResponse[]> {
@@ -49,17 +48,16 @@ export async function updateGetRequestStatus(
   token: string,
   request: GetRequestStatusUpdate
 ) {
-  return await (
-    await fetch(
-      `${import.meta.env.VITE_API_URL}/inventory_application/status/${token}`,
-      {
-        method: "PATCH",
-        headers: {
-          token: token,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(request),
-      }
-    )
-  ).json();
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/inventory_application/status/${token}`,
+    {
+      method: "PATCH",
+      headers: {
+        token: token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    }
+  );
+  return response.ok ? await response.json() : [];
 }

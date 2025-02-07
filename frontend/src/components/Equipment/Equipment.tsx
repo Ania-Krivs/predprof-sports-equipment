@@ -3,7 +3,7 @@ import { Inventory } from "../../static/types/Inventory";
 import { states } from "../../static/data/states";
 import { Link } from "react-router-dom";
 import { GetRequestResponse } from "../../static/types/Requests";
-import { statusNames } from "../../static/types/Status";
+import { Status, statusNames } from "../../static/types/Status";
 
 export function Equipment({
   equipment,
@@ -16,7 +16,7 @@ export function Equipment({
 }) {
   return (
     <div className={styles.equipment}>
-      {request ? (
+      {request && request.status !== Status.RETURNED ? (
         <div className={styles.request}>{statusNames[request.status]}</div>
       ) : (
         ""

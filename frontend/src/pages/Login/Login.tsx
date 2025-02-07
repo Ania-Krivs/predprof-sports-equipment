@@ -38,30 +38,34 @@ export function Login() {
           <button
             className={styles.btn}
             onClick={() => {
-              if (regMode) {
-                registerUser(login, password)
-                  .then((token) => {
-                    if (token) {
-                      setCookie("SUSI_TOKEN", token);
-                      navigate("/");
-                    }
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
-              } else {
-                loginUser(login, password, isAdmin)
-                  .then((token) => {
-                    if (token) {
-                      setCookie("SUSI_TOKEN", token, {
-                        path: "/",
-                      });
-                      navigate("/");
-                    }
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
+              if (login !== "" && password !== "") {
+                if (regMode) {
+                  registerUser(login, password)
+                    .then((token) => {
+                      if (token) {
+                        setCookie("SUSI_TOKEN", token, {
+                          path: "/",
+                        });
+                        navigate("/");
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                } else {
+                  loginUser(login, password, isAdmin)
+                    .then((token) => {
+                      if (token) {
+                        setCookie("SUSI_TOKEN", token, {
+                          path: "/",
+                        });
+                        navigate("/");
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                }
               }
             }}
           >
@@ -74,8 +78,18 @@ export function Login() {
             {regMode ? "Вход" : "Регистрация"}
           </button>
         </div>
-        <input type="checkbox" id="isAdmin" onChange={(evt) => setIsAdmin(evt.target.checked)} />
-        <label htmlFor="isAdmin">Как администратор</label>
+        {!regMode ? (
+          <>
+            <input
+              type="checkbox"
+              id="isAdmin"
+              onChange={(evt) => setIsAdmin(evt.target.checked)}
+            />
+            <label htmlFor="isAdmin">Как администратор</label>
+          </>
+        ) : (
+          ""
+        )}
       </div>
     </Layout>
   );

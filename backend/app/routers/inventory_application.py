@@ -135,6 +135,30 @@ async def update_status(admin_token: str, request: schemas.RequestApplicationUpd
             user.inventory.append(inventory_)
         
         await user.save()
+        
+    elif int(inventory_application.status) == int(Status.RETURNED):
+        inventory.amount = (inventory.amount + inventory_application.quantity)
+        await inventory.save()
+        
+        user = await User.find_one(User.id == ObjectId(inventory_application.user.id))
+        inventory_ = Inventory(
+                _id=inventory.id,
+                name=inventory.name,
+                amount=inventory.amount,
+                used_by_user=inventory.used_by_user,
+                image=inventory.image,
+                description=inventory.description,
+                state=inventory.state,
+                updated_at=inventory.updated_at,
+                created_at=inventory.created_at
+            )
+        if user.inventory is None:
+            user.inventory = inventory_
+        
+        else:
+            user.inventory = list(filter(lambda x: x.id != inventory_.id, user.inventory))
+        
+        await user.save()
 
     return inventory_application
 

@@ -26,3 +26,11 @@ export interface RepairRequestSchema {
   inventoryId: string;
   description: string;
 }
+
+export interface RepairRequestResponse {
+  _id: string;
+  user: User;
+  inventory: Inventory;
+  description: string;
+  status: Status;
+}

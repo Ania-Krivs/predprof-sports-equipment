@@ -1,6 +1,6 @@
 import styles from "./Admin.module.scss";
 import { Layout } from "../../components/Layout/Layout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Inventory } from "../../static/types/Inventory";
 import { Equipment } from "../../components/Equipment/Equipment";
@@ -9,15 +9,24 @@ import {
   getAllInventoryRequests,
   updateGetRequestStatus,
 } from "../../utils/requests/get";
-import { GetRequestResponse } from "../../static/types/Requests";
+import {
+  GetRequestResponse,
+  RepairRequestResponse,
+} from "../../static/types/Requests";
 import { useCookies } from "react-cookie";
 import { Status } from "../../static/types/Status";
+import { getUser } from "../../utils/requests/user";
+import { deleteRepairRequest, getAllRepairRequests } from "../../utils/requests/repair";
 
 export function Admin() {
+  const navigate = useNavigate();
   const [cookies] = useCookies(["SUSI_TOKEN"]);
 
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [getRequests, setGetRequests] = useState<GetRequestResponse[]>([]);
+  const [repairRequests, setRepairRequests] = useState<RepairRequestResponse[]>(
+    []
+  );
 
   function renderAdmin() {
     getInventory()
@@ -27,6 +36,7 @@ export function Admin() {
       .catch((err) => {
         console.log(err);
       });
+
     getAllInventoryRequests()
       .then((requests) => {
         setGetRequests(requests);
@@ -34,10 +44,24 @@ export function Admin() {
       .catch((err) => {
         console.log(err);
       });
+
+    getAllRepairRequests(cookies.SUSI_TOKEN)
+      .then((requests) => {
+        setRepairRequests(requests);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   useEffect(() => {
-    renderAdmin();
+    getUser(cookies.SUSI_TOKEN).then((user) => {
+      if (user.status === "ADMIN") {
+        renderAdmin();
+      } else {
+        navigate("/");
+      }
+    });
   }, []);
 
   return (
@@ -146,16 +170,10 @@ export function Admin() {
                   onClick={() => {
                     updateGetRequestStatus(cookies.SUSI_TOKEN, {
                       application_id: getRequest._id,
-                      status: Status.CANCELLED,
+                      status: Status.RETURNED,
                     })
                       .then(() => {
-                        getAllInventoryRequests()
-                          .then((requests) => {
-                            setGetRequests(requests);
-                          })
-                          .catch((err) => {
-                            console.log(err);
-                          });
+                        renderAdmin();
                       })
                       .catch((err) => {
                         console.log(err);
@@ -168,6 +186,40 @@ export function Admin() {
             </div>
           ))}
       </div>
+      {repairRequests.length > 0 ? (
+        <header className={styles.header}>Заявки на ремонт</header>
+      ) : (
+        ""
+      )}
+      <div className={styles.list}>{
+        repairRequests.map((repairRequest, index) => (
+          <div className={styles.request} key={index}>
+          <div className={styles.field + " " + styles.field_name}>
+            {repairRequest.inventory.name}
+          </div>
+          <div className={styles.field}>От: {repairRequest.user.username}</div>
+          <div className={styles.field}>
+            Описание: {repairRequest.description}
+          </div>
+          <div className={styles.btns}>
+            <button
+              className={styles.request_btn}
+              onClick={() => {
+                deleteRepairRequest(cookies.SUSI_TOKEN, repairRequest._id)
+                  .then(() => {
+                    renderAdmin();
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              }}
+            >
+              Удалить
+            </button>
+          </div>
+        </div>
+        ))
+        }</div>
     </Layout>
   );
 }

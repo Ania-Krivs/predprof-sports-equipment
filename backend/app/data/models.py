@@ -8,6 +8,7 @@ class Status(IntEnum):
     AWAITING = 0
     ACCEPTED = 1
     CANCELED = 2
+    RETURNED = 3
 
 
 class InventoryStatus(IntEnum):
