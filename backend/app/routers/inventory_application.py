@@ -108,7 +108,9 @@ async def update_status(admin_token: str, request: schemas.RequestApplicationUpd
     inventory = await Inventory.find_one(Inventory.id == ObjectId(inventory_application.inventory.id), fetch_links=True)
     if not inventory:
         raise HTTPException(404, detail="Inventory not found")
-                            
+    
+    start_status = inventory_application.status
+    
     inventory_application.status = request.status
     await inventory_application.save()
     
@@ -135,6 +137,30 @@ async def update_status(admin_token: str, request: schemas.RequestApplicationUpd
             user.inventory.append(inventory_)
         
         await user.save()
+        
+    if int(start_status) == int(Status.ACCEPTED) and int(inventory_application.status) == int(Status.CANCELED):
+        inventory.amount = (inventory.amount + inventory_application.quantity)
+        await inventory.save()
+        
+        user = await User.find_one(User.id == ObjectId(inventory_application.user.id))
+        inventory_ = Inventory(
+                _id=inventory.id,
+                name=inventory.name,
+                amount=inventory.amount,
+                used_by_user=inventory.used_by_user,
+                image=inventory.image,
+                description=inventory.description,
+                state=inventory.state,
+                updated_at=inventory.updated_at,
+                created_at=inventory.created_at
+            )
+        
+        for inventory in user.inventory:
+            if str(inventory.id) != str(inventory_application.inventory.id):
+                user.inventory.append(inventory_)
+        
+        await user.save()
+        
 
     return inventory_application
 
