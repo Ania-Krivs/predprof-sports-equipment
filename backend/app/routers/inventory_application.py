@@ -86,15 +86,8 @@ async def get_all_inventory_application_with_status(status: Optional[int] = None
     if not inventory_applications:
         raise HTTPException(404, "Equipment Applications not found")
     
-    return  [schemas.ResponseGetInventoryApplication(
-        _id=str(inventory_application.id),
-        user=inventory_application.user,
-        inventory=inventory_application.inventory,
-        quantity=inventory_application.quantity,
-        use_purpose=inventory_application.use_purpose,
-        status=inventory_application.status
-    )
-        for inventory_application in inventory_applications
+    return [
+        inventory_application for inventory_application in inventory_applications
     ]
 
 
