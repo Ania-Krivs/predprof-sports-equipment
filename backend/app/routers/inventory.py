@@ -11,6 +11,7 @@ from app.constants import default_image
 from bson import ObjectId
 from app.routers.user import redis
 
+import csv
 
 inventory_router = APIRouter(prefix="/inventory", tags=["Inventory"])
 
@@ -148,3 +149,13 @@ async def get_inventory_id(inventory_id: str):
         raise HTTPException(404, "Inventory not found")
     
     return inventory
+
+
+@inventory_router.get("/export_table/")
+async def get_table_inventorys():
+    all_data = await User.find_all().to_list()
+    with open('output.csv', 'w', newline='') as f:
+        csv.DictWriter(f).writerows(all_data)
+    with open('output.csv', 'r', newline='') as f:
+        pass
+    return ''
