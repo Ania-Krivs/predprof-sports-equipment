@@ -27,7 +27,7 @@ async def create_inventory_plan(admin_token: Annotated[str, Header()], request: 
     return inventory_plan
 
 
-@router.get("/aaa/{inventory_plan_id}")
+@router.get("/{inventory_plan_id}")
 async def get_inventory_plan_by_id(admin_token: Annotated[str, Header()], inventory_plan_id: str):
     username = redis.get(admin_token)
     if not username:
