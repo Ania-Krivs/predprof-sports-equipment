@@ -113,6 +113,10 @@ class UpdateInventoryPlan(BaseModel):
     manufacturer: Optional[str] = Field(None)
     price: Optional[float] = Field(None)
     
+class UpdateInventoryRepair(BaseModel):
+    inventory_repair_id: str
+    status: StatusInventoryRepair
+    
 class RequestInventoryRepair(BaseModel):
     inventory_id: str
     description: str

@@ -73,6 +73,26 @@ async def get_application_for_inventory_repair(admin_token: str) -> List:
        inventory_repair for inventory_repair in inventory_repairs
     ]
     
+@router.patch("/status/")
+async def update_inventory_repair(admin_token: Annotated[str, Header()], request: schemas.UpdateInventoryRepair):
+    username = redis.get(admin_token)
+    if not username:
+        raise HTTPException(401, "Token invalid")
+
+    admin = await Admin.find_one(Admin.username == username.decode("utf-8"))
+    if not admin:
+        raise HTTPException(404, "Admin not found")
+    
+    inventory_repair = await InventoryRepair.find_one(InventoryRepair.id == ObjectId(request.inventory_repair_id))
+    if not inventory_repair:
+        raise HTTPException(404, "Application not found")
+    
+    inventory_repair.status = request.status
+        
+    await inventory_repair.save()
+        
+    return inventory_repair
+
 @router.delete("/{admin_token}")
 async def delete_application_for_inventory_repair(admin_token: str, application_id: Annotated[str, Header()]) -> Dict[str, bool]:
     username = redis.get(admin_token)
