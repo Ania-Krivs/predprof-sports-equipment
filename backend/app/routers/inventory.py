@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from typing import Optional, List
-from app.data.models import Inventory, User, Admin
+from app.data.models import Inventory, User, Admin, InventoryApplication, InventoryRepair
 from app.data import schemas
 from datetime import datetime
 from app.exceptions import InventoryAlreadyExisted, InventoryNotFound, UserNotFound, NotEnoughInventory
@@ -9,6 +9,8 @@ from typing_extensions import Annotated
 from app.utils.image import process_image
 from app.constants import default_image
 from bson import ObjectId
+import os
+from fastapi.responses import FileResponse
 from app.routers.user import redis
 
 import csv
@@ -151,11 +153,56 @@ async def get_inventory_id(inventory_id: str):
     return inventory
 
 
-@inventory_router.get("/export_table/")
-async def get_table_inventorys():
+@inventory_router.get("/export_table/inventory")
+async def get_table_inventorys() -> FileResponse:
     all_data = await User.find_all().to_list()
-    with open('output.csv', 'w', newline='') as f:
-        csv.DictWriter(f).writerows(all_data)
-    with open('output.csv', 'r', newline='') as f:
-        pass
-    return ''
+    file_path = 'output.csv'
+    
+    with open(file_path, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["Пользователь", "Инвентарь название", "Инвентарь описание", "Инвентарь количество", "Инвентарь состояние", "Инвентарь создан", "Инвентарь обновлен", "Инвентарь использован"])
+        for data in all_data:
+            for inventory in data.inventory:
+                inventory_data = await Inventory.find_one(Inventory.id == inventory)
+                state = "Новый" if inventory_data.state == 2 else "Использованный" if inventory_data.state == 1 else "Сломанный"
+                writer.writerow([data.username, inventory_data.name, inventory_data.description, inventory_data.amount, state, inventory_data.created_at, inventory_data.updated_at, inventory_data.used_by_user])
+    
+    response = FileResponse(file_path, media_type='text/csv', filename='output.csv')
+    
+    return response
+
+@inventory_router.get("/export_table/applications/")
+async def get_table_applications() -> FileResponse:
+    all_data = await InventoryApplication.find_all().to_list()
+    file_path = 'output.csv'
+    
+    with open(file_path, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["Пользователь", "Инвентарь количество", "Инвентарь цель использования", "Статус заявки", "Инвентарь название", "Инвентарь описание", "Инвентарь количество", "Инвентарь состояние", "Инвентарь создан", "Инвентарь обновлен", "Инвентарь использован"])
+        for data in all_data:
+            user = await User.find_one(User.id == data.user)
+            inventory = await Inventory.find_one(Inventory.id == data.inventory, fetch_links=True)
+            writer.writerow([user.username, data.quantity, data.use_purpose, data.status, inventory.name, inventory.description, inventory.amount, inventory.state, inventory.created_at, inventory.updated_at, inventory.used_by_user])
+    
+    response = FileResponse(file_path, media_type='text/csv', filename='output.csv')
+    
+    return response
+
+@inventory_router.get("/export_table/inventory_repair/")
+async def get_table_inventory_repair() -> FileResponse:
+    all_data = await InventoryRepair.find_all().to_list()
+    file_path = 'output.csv'
+    
+    with open(file_path, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["Пользователь", "Описание заявки", "Статус заявки", "Инвентарь название", "Инвентарь описание", "Инвентарь состояние", "Инвентарь создан", "Инвентарь обновлен", "Инвентарь использован"])
+        for data in all_data:
+            user = await User.find_one(User.id == data.user)
+            inventory = await Inventory.find_one(Inventory.id == data.inventory, fetch_links=True)
+            stateInv = "Новый" if inventory.state == 2 else "Использованный" if inventory.state == 1 else "Сломанный"
+            stateAppl = "Ремонт" if data.status == 0 else "Замена"
+            writer.writerow([user.username, data.description, stateAppl, inventory.name, inventory.description, stateInv, inventory.created_at, inventory.updated_at, inventory.used_by_user])
+    
+    response = FileResponse(file_path, media_type='text/csv', filename='output.csv')
+    
+    return response
