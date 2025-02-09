@@ -158,7 +158,7 @@ async def get_table_inventorys() -> FileResponse:
     all_data = await User.find_all().to_list()
     file_path = 'output.csv'
     
-    with open(file_path, 'w', newline='') as f:
+    with open(file_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(["Пользователь", "Инвентарь название", "Инвентарь описание", "Инвентарь количество", "Инвентарь состояние", "Инвентарь создан", "Инвентарь обновлен", "Инвентарь использован"])
         for data in all_data:
@@ -176,7 +176,7 @@ async def get_table_applications() -> FileResponse:
     all_data = await InventoryApplication.find_all().to_list()
     file_path = 'output.csv'
     
-    with open(file_path, 'w', newline='') as f:
+    with open(file_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(["Пользователь", "Инвентарь количество", "Инвентарь цель использования", "Статус заявки", "Инвентарь название", "Инвентарь описание", "Инвентарь количество", "Инвентарь состояние", "Инвентарь создан", "Инвентарь обновлен", "Инвентарь использован"])
         for data in all_data:
@@ -193,7 +193,7 @@ async def get_table_inventory_repair() -> FileResponse:
     all_data = await InventoryRepair.find_all().to_list()
     file_path = 'output.csv'
     
-    with open(file_path, 'w', newline='') as f:
+    with open(file_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(["Пользователь", "Описание заявки", "Статус заявки", "Инвентарь название", "Инвентарь описание", "Инвентарь состояние", "Инвентарь создан", "Инвентарь обновлен", "Инвентарь использован"])
         for data in all_data:
