@@ -109,8 +109,6 @@ async def update_status(admin_token: str, request: schemas.RequestApplicationUpd
     if not inventory:
         raise HTTPException(404, detail="Inventory not found")
     
-    start_status = inventory_application.status
-    
     inventory_application.status = request.status
     await inventory_application.save()
     
@@ -143,20 +141,11 @@ async def update_status(admin_token: str, request: schemas.RequestApplicationUpd
         await inventory.save()
         
         user = await User.find_one(User.id == ObjectId(inventory_application.user.id))
-        inventory_ = Inventory(
-                _id=inventory.id,
-                name=inventory.name,
-                amount=inventory.amount,
-                used_by_user=inventory.used_by_user,
-                image=inventory.image,
-                description=inventory.description,
-                state=inventory.state,
-                updated_at=inventory.updated_at,
-                created_at=inventory.created_at
-            )
+        
+        user.inventory = []
         
         for invent in user.inventory:
-            if str(invent.id) != str(inventory_application.id):
+            if str(invent.id) != str(inventory_application.inventory.id):
                 user.inventory.append(invent)
                 
         await user.save()
