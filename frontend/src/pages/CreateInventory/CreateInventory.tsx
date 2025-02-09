@@ -1,10 +1,14 @@
 import styles from "./CreateInventory.module.scss";
 import { Layout } from "../../components/Layout/Layout";
 import { CreateInventory as ICreateInventory } from "../../static/types/Inventory";
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import { inventoryStatusNames } from "../../static/types/Status";
-import { createInventory } from "../../utils/requests/inventory";
+import {
+  createInventory,
+  updateInventoryImage,
+} from "../../utils/requests/inventory";
 import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 function reducer(
   state: ICreateInventory,
@@ -20,18 +24,28 @@ function reducer(
 }
 
 export function CreateInventory() {
+  const [cookies] = useCookies(["SUSI_TOKEN"]);
   const navigate = useNavigate();
 
   const [state, dispatch] = useReducer(reducer, {
     name: "",
-    amount: 0,
+    amount: 1,
     state: 0,
     description: "",
   });
 
+  const [file, setFile] = useState<File>();
+
   return (
     <Layout>
       <header className={styles.header}>Создать инвентарь</header>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(evt) => {
+          setFile(Array.from(evt.target.files ?? [])[0]);
+        }}
+      />
       <input
         type="text"
         className={styles.input}
@@ -75,8 +89,18 @@ export function CreateInventory() {
             state.amount > 0
           ) {
             createInventory(state)
-              .then(() => {
-                navigate("/admin");
+              .then((inventory) => {
+                if (file) {
+                  updateInventoryImage(cookies.SUSI_TOKEN, inventory._id, file)
+                    .then(() => {
+                      navigate("/admin");
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                } else {
+                  navigate("/admin");
+                }
               })
               .catch((err) => {
                 console.log(err);

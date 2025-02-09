@@ -44,7 +44,7 @@ async def get_inventory_plan_by_id(admin_token: Annotated[str, Header()], invent
     return inventory_plan
 
 
-@router.get("/all")
+@router.get("/")
 async def get_inventory_plan(admin_token: Annotated[str, Header()]) -> List:
     username = redis.get(admin_token)
     if not username:

@@ -18,7 +18,7 @@ export async function getInventoryById(id: string): Promise<Inventory> {
 
 export async function createInventory(
   inventory: CreateInventory
-): Promise<string> {
+): Promise<{_id: string}> {
   return await (
     await fetch(`${import.meta.env.VITE_API_URL}/inventory/add_inventory`, {
       method: "POST",
@@ -41,3 +41,22 @@ export async function editInventory(inventory: EditInventory): Promise<string> {
     })
   ).json();
 }
+
+export async function updateInventoryImage(token: string, id: string, file: File): Promise<string> {
+  const formData = new FormData();
+
+  formData.append('file', file);
+  formData.append('extension', file.name.split('.').pop() ?? "jpg");
+
+  return await (
+    await fetch(`${import.meta.env.VITE_API_URL}/inventory/update_image`, {
+      method: "PATCH",
+      headers: {
+        "inventory-id": id,
+        "token": token
+      },
+      body: formData,
+    })
+  ).json();
+}
+

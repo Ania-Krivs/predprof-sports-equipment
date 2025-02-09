@@ -9,9 +9,11 @@ import { inventoryStatusNames } from "../../static/types/Status";
 import {
   editInventory,
   getInventoryById,
+  updateInventoryImage,
 } from "../../utils/requests/inventory";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 function reducer(
   state: IEditInventory,
@@ -27,6 +29,7 @@ function reducer(
 }
 
 export function EditInventory() {
+  const [cookies] = useCookies(["SUSI_TOKEN"]);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -39,6 +42,7 @@ export function EditInventory() {
   });
 
   const [inventory, setInventory] = useState<Inventory>();
+  const [file, setFile] = useState<File>();
 
   useEffect(() => {
     if (id) {
@@ -61,6 +65,13 @@ export function EditInventory() {
       <header className={styles.header}>Редактировать инвентарь</header>
       {inventory ? (
         <>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(evt) => {
+              setFile(Array.from(evt.target.files ?? [])[0]);
+            }}
+          />
           <input
             type="text"
             className={styles.input}
@@ -111,7 +122,21 @@ export function EditInventory() {
               ) {
                 editInventory(state)
                   .then(() => {
-                    navigate("/admin");
+                    if (file) {
+                      updateInventoryImage(
+                        cookies.SUSI_TOKEN,
+                        id ?? "",
+                        file ?? ""
+                      )
+                        .then(() => {
+                          navigate("/admin");
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                        });
+                    } else {
+                      navigate("/admin");
+                    }
                   })
                   .catch((err) => {
                     console.log(err);

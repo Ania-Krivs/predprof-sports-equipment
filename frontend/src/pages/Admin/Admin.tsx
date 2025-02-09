@@ -20,6 +20,8 @@ import {
   deleteRepairRequest,
   getAllRepairRequests,
 } from "../../utils/requests/repair";
+import { addToPlan, deleteFromPlan, getPlan } from "../../utils/requests/plan";
+import { Plan } from "../../static/types/Plan";
 
 export function Admin() {
   const navigate = useNavigate();
@@ -30,11 +32,17 @@ export function Admin() {
   const [repairRequests, setRepairRequests] = useState<RepairRequestResponse[]>(
     []
   );
+  const [plan, setPlan] = useState<Plan[]>([]);
+
+  const [name, setName] = useState<string>("");
+  const [manufacturer, setManufacturer] = useState<string>("");
+  const [price, setPrice] = useState<string>("");
 
   function renderAdmin() {
     getInventory()
       .then((inventory) => {
         setInventory(inventory);
+        setName(inventory[0].name);
       })
       .catch((err) => {
         console.log(err);
@@ -51,6 +59,14 @@ export function Admin() {
     getAllRepairRequests(cookies.SUSI_TOKEN)
       .then((requests) => {
         setRepairRequests(requests);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    getPlan(cookies.SUSI_TOKEN)
+      .then((plan) => {
+        setPlan(plan);
       })
       .catch((err) => {
         console.log(err);
@@ -256,6 +272,79 @@ export function Admin() {
             </div>
           </div>
         ))}
+      </div>
+
+      <header className={styles.header}>План закупок</header>
+      <div className={styles.list}>
+        {plan.map((planItem, index) => (
+          <div className={styles.plan} key={index}>
+            <div className={styles.plan_field}>
+              Оборудование: {planItem.name}
+            </div>
+            <div className={styles.plan_field}>
+              Производитель: {planItem.manufacturer}
+            </div>
+            <div className={styles.plan_field}>Цена: {planItem.price}₽</div>
+            <div
+              className={styles.plan_field + " " + styles.plan_field_delete}
+              onClick={() => {
+                deleteFromPlan(cookies.SUSI_TOKEN, planItem._id)
+                  .then(() => {
+                    renderAdmin();
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              }}
+            >
+              Удалить
+            </div>
+          </div>
+        ))}
+        <div className={styles.plan}>
+          <select
+            className={styles.input}
+            onChange={(evt) => setName(evt.target.value)}
+          >
+            {inventory.map((inventoryItem, index) => (
+              <option value={inventoryItem.name} key={index}>
+                {inventoryItem.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            className={styles.input}
+            placeholder="Производитель"
+            onChange={(evt) => setManufacturer(evt.target.value)}
+          />
+          <input
+            type="number"
+            className={styles.input}
+            placeholder="Цена (₽)"
+            onChange={(evt) => setPrice(evt.target.value)}
+          />
+          <button
+            className={styles.btn}
+            onClick={() => {
+              if (name && manufacturer && price && !isNaN(Number(price))) {
+                addToPlan(cookies.SUSI_TOKEN, {
+                  name: name,
+                  manufacturer: manufacturer,
+                  price: Number(price),
+                })
+                  .then(() => {
+                    renderAdmin();
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  });
+              }
+            }}
+          >
+            Добавить
+          </button>
+        </div>
       </div>
     </Layout>
   );
