@@ -16,7 +16,10 @@ import {
 import { useCookies } from "react-cookie";
 import { Status } from "../../static/types/Status";
 import { getUser } from "../../utils/requests/user";
-import { deleteRepairRequest, getAllRepairRequests } from "../../utils/requests/repair";
+import {
+  deleteRepairRequest,
+  getAllRepairRequests,
+} from "../../utils/requests/repair";
 
 export function Admin() {
   const navigate = useNavigate();
@@ -67,9 +70,41 @@ export function Admin() {
   return (
     <Layout>
       <header className={styles.header}>Админ-панель</header>
+      <a
+        href={`${
+          import.meta.env.VITE_API_URL
+        }/inventory/export_table/inventory`}
+        download
+        target="_blank"
+        className={styles.file}
+      >
+        Отчет по инвентарю
+      </a>
+      <a
+        href={`${
+          import.meta.env.VITE_API_URL
+        }/inventory/export_table/applications`}
+        download
+        target="_blank"
+        className={styles.file}
+      >
+        Отчет по заявкам
+      </a>
+      <a
+        href={`${
+          import.meta.env.VITE_API_URL
+        }/inventory/export_table/inventory_repair`}
+        download
+        target="_blank"
+        className={styles.file}
+      >
+        Отчет по ремонту
+      </a>
+
       <Link className={styles.link} to="/admin/create">
         Создать инвентарь
       </Link>
+
       <div className={styles.list}>
         {inventory.map((item, index) => (
           <Equipment equipment={item} isEditable={true} key={index} />
@@ -191,35 +226,37 @@ export function Admin() {
       ) : (
         ""
       )}
-      <div className={styles.list}>{
-        repairRequests.map((repairRequest, index) => (
+      <div className={styles.list}>
+        {repairRequests.map((repairRequest, index) => (
           <div className={styles.request} key={index}>
-          <div className={styles.field + " " + styles.field_name}>
-            {repairRequest.inventory.name}
+            <div className={styles.field + " " + styles.field_name}>
+              {repairRequest.inventory.name}
+            </div>
+            <div className={styles.field}>
+              От: {repairRequest.user.username}
+            </div>
+            <div className={styles.field}>
+              Описание: {repairRequest.description}
+            </div>
+            <div className={styles.btns}>
+              <button
+                className={styles.request_btn}
+                onClick={() => {
+                  deleteRepairRequest(cookies.SUSI_TOKEN, repairRequest._id)
+                    .then(() => {
+                      renderAdmin();
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                }}
+              >
+                Удалить
+              </button>
+            </div>
           </div>
-          <div className={styles.field}>От: {repairRequest.user.username}</div>
-          <div className={styles.field}>
-            Описание: {repairRequest.description}
-          </div>
-          <div className={styles.btns}>
-            <button
-              className={styles.request_btn}
-              onClick={() => {
-                deleteRepairRequest(cookies.SUSI_TOKEN, repairRequest._id)
-                  .then(() => {
-                    renderAdmin();
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
-              }}
-            >
-              Удалить
-            </button>
-          </div>
-        </div>
-        ))
-        }</div>
+        ))}
+      </div>
     </Layout>
   );
 }

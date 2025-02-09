@@ -22,14 +22,16 @@ export function Home() {
       if (user.status === "USER") {
         Promise.all([getInventory(), getInventoryRequests(cookies.SUSI_TOKEN)])
           .then(([inventory, requests]) => {
+            setRequests(requests.reverse());
             setInventory(inventory);
-            setRequests(requests);
           })
           .catch((err) => {
             console.log(err);
           });
       } else if (user.status === "ADMIN") {
         navigate("/admin");
+      } else {
+        navigate("/login");
       }
     });
   }, []);

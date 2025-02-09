@@ -138,7 +138,7 @@ async def update_status(admin_token: str, request: schemas.RequestApplicationUpd
         
         await user.save()
         
-    if int(start_status) == int(Status.ACCEPTED) and int(inventory_application.status) == int(Status.CANCELED):
+    if int(inventory_application.status) == int(Status.RETURNED):
         inventory.amount = (inventory.amount + inventory_application.quantity)
         await inventory.save()
         
