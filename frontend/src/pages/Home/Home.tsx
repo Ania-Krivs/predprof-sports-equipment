@@ -22,7 +22,7 @@ export function Home() {
       if (user.status === "USER") {
         Promise.all([getInventory(), getInventoryRequests(cookies.SUSI_TOKEN)])
           .then(([inventory, requests]) => {
-            setRequests(requests.reverse());
+            setRequests(requests);
             setInventory(inventory);
           })
           .catch((err) => {
