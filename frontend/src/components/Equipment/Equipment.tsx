@@ -1,9 +1,10 @@
 import styles from "./Equipment.module.scss";
 import { Inventory } from "../../static/types/Inventory";
 import { states } from "../../static/data/states";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GetRequestResponse } from "../../static/types/Requests";
 import { Status, statusNames } from "../../static/types/Status";
+import { deleteInventory } from '../../utils/requests/inventory';
 
 export function Equipment({
   equipment,
@@ -14,6 +15,8 @@ export function Equipment({
   isEditable: boolean;
   request?: GetRequestResponse;
 }) {
+  const navigate = useNavigate();
+
   return (
     <div className={styles.equipment}>
       {request && request.status !== Status.RETURNED ? (
@@ -40,6 +43,15 @@ export function Equipment({
             <Link to={`/admin/edit/${equipment._id}`} className={styles.btn}>
               Редактировать
             </Link>
+            <button className={styles.btn} onClick={() => {
+              deleteInventory(equipment._id)
+              .then(() => {
+                navigate(0);
+              })
+              .catch(err => {
+                console.log(err);
+              })
+            }}>Удалить</button>
           </div>
         ) : (
           <div className={styles.btns}>

@@ -18,9 +18,9 @@ import csv
 inventory_router = APIRouter(prefix="/inventory", tags=["Inventory"])
 
 
-@inventory_router.delete("/delete_inventory")
-async def delete_inventory_by_id(delete_data: schemas.SInventoryId) -> dict:
-    inventory = await Inventory.find_one(Inventory.id == ObjectId(delete_data.id))
+@inventory_router.delete("/delete_inventory/{id}")
+async def delete_inventory_by_id(id: str) -> dict:
+    inventory = await Inventory.find_one(Inventory.id == ObjectId(id))
     if not inventory:
         raise InventoryNotFound
 
